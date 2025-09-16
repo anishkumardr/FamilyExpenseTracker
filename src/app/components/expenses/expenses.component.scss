@@ -1,0 +1,17 @@
+/* src/app/expenses/expenses.component.scss */
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 12px;
+}
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.expenses-table th, .expenses-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+.expenses-table th {
+  background: #f2f2f2;
+}

@@ -1,0 +1,63 @@
+<!-- src/app/components/add-expense/add-expense.component.html -->
+<div class="add-expense">
+  <h3>Add Expense</h3>
+  <div class="toggle-section">
+      <label>
+        <input type="checkbox" [(ngModel)]="easyEntry" />
+        Easy Entry Mode
+      </label>
+    </div>
+  <!-- Easy Entry LLM Text Area -->
+    <div *ngIf="easyEntry" class="easy-entry">
+      <textarea [(ngModel)]="inputText" placeholder="Enter expense (e.g. Bought coffee 200 rupees at Starbucks)"></textarea>
+      <button (click)="parseExpense()">Parse Expense</button>
+    </div>
+
+  <form *ngIf="!easyEntry" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="row">
+      <label>Amount</label>
+      <input type="number" formControlName="amount" step="0.01" placeholder="0.00" />
+    </div>
+
+    <div class="row">
+      <label>Currency</label>
+      <input type="text" formControlName="currency" />
+    </div>
+
+    <div class="row">
+      <label>Date</label>
+      <input type="date" formControlName="occurred_at" />
+    </div>
+
+    <div class="row">
+      <label>Category</label>
+      <input type="text" formControlName="category" />
+    </div>
+
+    <div class="row">
+      <label>Merchant</label>
+      <input type="text" formControlName="merchant" />
+    </div>
+
+    <div class="row">
+      <label>Description</label>
+      <input type="text" formControlName="description" />
+    </div>
+
+    <div class="row">
+      <button type="submit" [disabled]="loading">Add Expense</button>
+    </div>
+  </form>
+</div>
+ <!-- Confirmation Popup -->
+    <div *ngIf="showConfirmPopup" class="popup">
+      <h3>Confirm Parsed Expense</h3>
+      <pre>{{ parsedExpense | json }}</pre>
+      <button (click)="confirmSave()">Ok</button>
+      <button (click)="cancelParse()">Cancel</button>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success">
+      {{ successMessage }}
+    </div>

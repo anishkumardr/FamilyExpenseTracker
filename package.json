@@ -6,17 +6,22 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "build:netlify": "node ./scripts/set-env.js && ng build --configuration production"
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^19.2.19",
     "@angular/common": "^19.2.0",
     "@angular/compiler": "^19.2.0",
     "@angular/core": "^19.2.0",
     "@angular/forms": "^19.2.0",
+    "@angular/material": "^19.2.19",
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@angular/service-worker": "^19.2.0",
+    "@supabase/supabase-js": "^2.57.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -33,5 +38,16 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.7.2"
+  },
+  "projects": {
+  "familyExpenseTracker": {
+    "architect": {
+      "build": {
+        "options": {
+          "outputPath": "dist/family-Expense-Tracker"
+        }
+      }
+    }
   }
+}
 }

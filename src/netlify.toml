@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "dist/family-Expense-Tracker"   # replace <PROJECT_NAME> with your angular.json project name
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/ngsw-worker.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer-when-downgrade"

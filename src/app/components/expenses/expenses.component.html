@@ -1,0 +1,44 @@
+<!-- src/app/expenses/expenses.component.html -->
+<div class="container">
+  <app-add-expense (added)="onExpenseAdded($event)"></app-add-expense>
+
+  <h2>Family Expenses</h2>
+
+  <table class="expenses-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Category</th>
+        <th>Merchant</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>User</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of expenses">
+        <td *ngIf="editingExpense?.id !== e.id">{{ e.occurred_at | date:'short' }}</td>
+        <td *ngIf="editingExpense?.id !== e.id">{{ e.category }}</td>
+        <td *ngIf="editingExpense?.id !== e.id">{{ e.merchant }}</td>
+        <td *ngIf="editingExpense?.id !== e.id">{{ e.description }}</td>
+        <td *ngIf="editingExpense?.id !== e.id">{{ e.amount }} {{ e.currency }}</td>
+        <td>{{ e.user_id }}</td>
+         <ng-container *ngIf="editingExpense?.id === e.id">
+            <td><input [(ngModel)]="editingExpense.category" /></td>
+            <td><input [(ngModel)]="editingExpense.merchant" /></td>
+            <td><input [(ngModel)]="editingExpense.description" /></td>
+            <td><input type="number" [(ngModel)]="editingExpense.amount" /></td>
+          </ng-container>
+        <td>
+      <!-- Normal Mode -->
+      <button *ngIf="editingExpense?.id !== e.id" (click)="startEdit(e)">Edit</button>
+      <button *ngIf="editingExpense?.id !== e.id" (click)="deleteExpense(e.id)">Delete</button>
+
+      <!-- Edit Mode -->
+      <button *ngIf="editingExpense?.id === e.id" (click)="saveEdit()">Save</button>
+      <button *ngIf="editingExpense?.id === e.id" (click)="cancelEdit()">Cancel</button>
+    </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
