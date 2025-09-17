@@ -98,13 +98,13 @@ console.log('Add expense payload:', payload);
   }
   async parseExpense() {
     this.parserService.parseExpense(this.inputText).subscribe((parsed) => {
-console.log ('user id and family id:', this.supabase.currentUserId, this.supabase.currentFamilyId);
+      console.log('Parsed expense:', parsed);
  var expenseForDb: any = {};
 this.supabase.currentUserId.then(userId => {
   console.log("Current User ID:", userId);
   this.supabase.currentFamilyId.then(familyId => {
   console.log("Current familyId:", familyId);
-
+console.log('Parsed expense:', parsed.amount, parsed.category, parsed.occurred_at, parsed.merchant, parsed.description);
   expenseForDb = {
       user_id: userId, // 👈 add getter in service
       family_id: familyId, // 👈 add getter in service
@@ -115,12 +115,7 @@ this.supabase.currentUserId.then(userId => {
       merchant: parsed.merchant ?? "",
       description: parsed.description ?? "",
     };
-
-});
-
-});
-
-    console.log('Parsed expense object for DB:', expenseForDb);
+console.log('Parsed expense object for DB:'+ expenseForDb.amount+ expenseForDb.category+expenseForDb.occurred_at+expenseForDb.merchant+expenseForDb.description);
       const dialogRef = this.dialog.open(ConfirmDialogComponent, {
         data: expenseForDb,
       });
@@ -143,15 +138,10 @@ this.supabase.currentUserId.then(userId => {
         }
       });
     });
-    // this.parserService.parseExpense(this.inputText).subscribe({
-    //   next: (res) => {
-    //     console.log('Parsed result:', res);
-    //     this.parsedExpense = res;
-    //   },
-    //   error: (err) => {
-    //     console.error('Error parsing expense:', err);
-    //   }
-    // });
+});
+
+});
+
   }
 
    confirmSave() {
