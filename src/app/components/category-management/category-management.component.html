@@ -1,0 +1,65 @@
+<!-- src/app/components/category-management/category-management.component.html -->
+<div class="cat-root">
+  <h3 class="page-title">Category Management</h3>
+
+  <div class="grid">
+    <div class="grid-item" *ngFor="let c of categories">
+      <div *ngIf="editId !== c.id" class="row">
+        <div class="left">
+          <div class="text">
+            <div class="name" [class.active]="c.status" [class.inactive]="!c.status">{{ c.category_name }}</div>
+            <div class="desc">{{ c.description }}</div>
+          </div>
+         </div>
+        <div class="right">
+          <div class="actions">
+            <button class="icon-btn" (click)="startEdit(c)"><span class="material-icons">edit</span></button>
+            <button class="icon-btn" (click)="deleteCategory(c)"><span class="material-icons">delete</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inline edit -->
+      <div *ngIf="editId === c.id" class="edit-row">
+        <input #nameInput type="text" [value]="c.category_name" class="input" />
+        <input #descInput type="text" [value]="c.description" class="input small" />
+        <label class="switch">
+          <input #statusInput type="checkbox" [checked]="c.status" />
+          <span class="slider"></span>
+        </label>
+        <div class="edit-actions">
+          <button (click)="saveEdit(c, nameInput, descInput, statusInput)" class="save-btn">Save</button>
+          <button (click)="cancelEdit()" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating + only on this page -->
+  <button type="button" class="fab" (click)="openAdd();"><span class="material-icons">add</span></button>
+
+  <!-- Bottom-sheet add form -->
+  <div class="popup-backdrop" *ngIf="showAddPopup" (click)="showAddPopup=false">
+    <div class="popup" (click)="$event.stopPropagation()">
+      <h4>New Category</h4>
+      <form [formGroup]="addForm" (ngSubmit)="addCategory()">
+        <input formControlName="name" placeholder="Category name" class="input" />
+        <input formControlName="description" placeholder="Description" class="input" />
+        <label class="switch-row">
+          <span>Status</span>
+          <label class="switch">
+            <input type="checkbox" formControlName="status" />
+            <span class="slider"></span>
+          </label>
+        </label>
+        <div class="popup-actions">
+          <button type="button" class="btn secondary" (click)="showAddPopup=false">Cancel</button>
+          <button type="submit" class="btn primary" [disabled]="addForm.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" *ngIf="toastVisible">{{ toastMessage }}</div>
+</div>

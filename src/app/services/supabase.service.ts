@@ -13,7 +13,8 @@ export class SupabaseService {
     console.log('Supabase Key:', environment.supabaseKey);
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
-
+lightTheme = false;
+  toggleTheme(){ this.lightTheme = !this.lightTheme; }
   // Test function: fetch users
   async getUsers() {
     const { data, error } = await this.supabase.from('app_users').select('*');
@@ -151,5 +152,7 @@ get currentFamilyId() {
     return this.loadProfile(userId).then(profile => profile?.family_id);
   });
 }
-
+get auth() {
+    return this.supabase.auth;
+  }
 }

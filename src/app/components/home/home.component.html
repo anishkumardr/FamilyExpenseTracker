@@ -1,0 +1,43 @@
+<div class="home-root">
+      <h2 class="greeting">Hi Kailash</h2>
+
+      <mat-card class="total-card">
+        <div class="total-left">
+          <div class="amount">₹ 13,200</div>
+          <div class="sub">Total Expense Till Now</div>
+        </div>
+        <button mat-button class="view">View All</button>
+      </mat-card>
+
+      <h3 class="section-title">OVERALL EXPENSES</h3>
+      <mat-card class="chart-card">
+        <!-- mock pie circle -->
+        <div class="pie-placeholder">Pie Chart</div>
+        <div class="legend">
+          <div *ngFor="let l of legend" class="legend-item">
+            <span class="dot" [style.background]="l.color"></span>
+            <span>{{l.label}}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="metrics">
+        <div class="metric"><div class="circle">₹</div><div class="label">Total Income<br><b>60,000</b></div></div>
+        <div class="metric"><div class="circle">₹</div><div class="label">Bank Balance<br><b>53,200</b></div></div>
+        <div class="metric"><div class="circle">₹</div><div class="label">Total Dues<br><b>13,000</b></div></div>
+      </mat-card>
+
+      <h3 class="section-title">TOP EXPENSES</h3>
+      <div class="top-expenses">
+        <mat-card class="expense-card" *ngFor="let e of topExpenses">
+          <div class="left">
+            <div class="date">{{e.date}}</div>
+            <div class="cat">{{e.category}}</div>
+          </div>
+          <div class="right">
+            <div class="amt">₹ {{e.amount}}</div>
+            <div class="desc">{{e.desc}}</div>
+          </div>
+        </mat-card>
+      </div>
+    </div>

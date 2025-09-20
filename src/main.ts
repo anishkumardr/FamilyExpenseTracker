@@ -5,11 +5,13 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { isDevMode } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideHttpClient(withInterceptorsFromDi()), provideServiceWorker('ngsw-worker.js', {
+    provideHttpClient(withInterceptorsFromDi()),provideAnimations(), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
           }), provideServiceWorker('ngsw-worker.js', {

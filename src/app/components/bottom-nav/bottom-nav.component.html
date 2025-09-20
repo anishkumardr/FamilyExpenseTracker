@@ -1,0 +1,27 @@
+<nav class="bottom-nav">
+  <a routerLink="/home" routerLinkActive="active" >
+    <span class="material-icons-outlined">home</span>
+    <span>Home</span>
+  </a>
+  <a routerLink="/expenses" routerLinkActive="active">
+    <span class="material-icons-outlined">receipt_long</span>
+    <span>Expenses</span>
+  </a>
+  <a routerLink="/allotment" routerLinkActive="active">
+    <span class="material-icons-outlined">account_balance_wallet</span>
+    <span>Allotment</span>
+  </a>
+  <a routerLink="/reports" routerLinkActive="active">
+    <span class="material-icons-outlined">bar_chart</span>
+    <span>Reports</span>
+  </a>
+  <a (click)="toggleSetup($event)" [class.active]="showSetupMenu">
+    <span class="material-icons">settings</span>
+    <span>Setup</span>
+  </a>
+  <!-- Submenu (slides up) -->
+<div class="setup-submenu" *ngIf="showSetupMenu" (click)="$event.stopPropagation()">
+  <a routerLink="/category-management" routerLinkActive="active" (click)="onSubmenuClick()">Category Management</a>
+  <a routerLink="/income-management" routerLinkActive="active" (click)="onSubmenuClick()">Income Management</a>
+</div>
+</nav>

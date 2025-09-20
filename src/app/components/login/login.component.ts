@@ -17,7 +17,9 @@ export class LoginComponent {
   errorMessage = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {
+    console.log('LoginComponent initialized');
+  }
 
   async onLogin() {
     this.errorMessage = '';
@@ -26,7 +28,7 @@ export class LoginComponent {
     try {
       const result = await this.authService.login(this.email, this.password);
       console.log('Login successful:', result);
-      this.router.navigate(['/expenses']);
+      this.router.navigate(['/home']);
     } catch (err: any) {
       this.errorMessage = err.message;
     } finally {

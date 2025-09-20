@@ -1,0 +1,20 @@
+.greeting{font-size:20px;margin:4px 0 12px 0}
+    .total-card{display:flex;justify-content:space-between;align-items:center;padding:16px;background:var(--card);color:var(--text);border-radius:12px}
+    .amount{font-size:20px;font-weight:700}
+    .sub{font-size:12px;color:var(--muted)}
+    .section-title{font-size:12px;margin:16px 0 8px;color:var(--muted);font-weight:700}
+    .chart-card{padding:16px;border-radius:12px}
+    .pie-placeholder{height:120px;border-radius:999px;background:linear-gradient(90deg,#2b2b2b,#343434);display:flex;align-items:center;justify-content:center;color:var(--muted)}
+    .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .legend-item{display:flex;gap:8px;align-items:center;color:var(--muted)}
+    .dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+    .metrics{display:flex;gap:8px;padding:12px;border-radius:12px;justify-content:space-between}
+    .metric{display:flex;gap:8px;align-items:center}
+    .circle{width:44px;height:44px;border-radius:22px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center}
+    .top-expenses{display:flex;flex-direction:column;gap:10px;margin-bottom:120px}
+    .expense-card{display:flex;justify-content:space-between;padding:12px;border-radius:10px}
+    .left .date{font-size:12px;color:var(--muted)}
+    .left .cat{font-weight:600}
+    .right .amt{font-weight:700}
+    .right .desc{font-size:12px;color:var(--muted)}
+    @media(min-width:720px){ .pie-placeholder{height:180px} }

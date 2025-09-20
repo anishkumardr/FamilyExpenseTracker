@@ -1,0 +1,110 @@
+<!-- src/app/components/income-management/income-management.component.html -->
+<div class="income-root">
+  <h3 class="page-title">Income Management</h3>
+
+  <div class="grid">
+    <div class="grid-item" *ngFor="let i of incomes">
+      <!-- Display row -->
+      <div *ngIf="editId !== i.id" class="row">
+        <div class="left">
+          <div class="text">
+            <div class="name">{{ getUserName(i.user_id) }}</div>
+            <div class="desc">
+              {{ getIncomeTypeName(i.income_type || 0) }} |
+              {{ (i.amount ?? 0) | number:'1.0-2' }} |
+              {{ i.date_received || '' }}
+            </div>
+            <div class="notes" *ngIf="i.notes">Notes: {{ i.notes }}</div>
+            <div class="source" *ngIf="i.source_name">Source: {{ i.source_name }}</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="actions">
+            <button class="icon-btn" (click)="startEdit(i)">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="icon-btn" (click)="deleteIncome(i)">
+              <span class="material-icons">delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inline edit row -->
+      <div *ngIf="editId === i.id" class="edit-row">
+        <select [(ngModel)]="i.user_id" class="input">
+          <option *ngFor="let u of users" [value]="u.id">{{ u.full_name }}</option>
+        </select>
+
+        <select [(ngModel)]="i.income_type" class="input">
+          <option *ngFor="let t of incomeTypes" [value]="t.id">{{ t.name }}</option>
+        </select>
+
+        <input type="number" [(ngModel)]="i.amount" class="input" placeholder="Amount" />
+
+        <input type="date" [(ngModel)]="i.date_received" class="input" />
+
+        <label class="switch-row">
+          <span>Recurring</span>
+          <label class="switch small">
+            <input type="checkbox" [(ngModel)]="i.recurring" />
+            <span class="slider"></span>
+          </label>
+        </label>
+
+        <input type="text" [(ngModel)]="i.source_name" class="input small" placeholder="Source" />
+        <input type="text" [(ngModel)]="i.notes" class="input small" placeholder="Notes" />
+
+        <div class="edit-actions">
+          <button (click)="saveEdit()" class="save-btn">Save</button>
+          <button (click)="cancelEdit()" class="cancel-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating + button -->
+  <button type="button" class="fab" (click)="openAdd()">
+    <span class="material-icons">add</span>
+  </button>
+
+  <!-- Bottom-sheet add form -->
+  <div class="popup-backdrop" *ngIf="showAddPopup" (click)="showAddPopup=false">
+    <div class="popup" (click)="$event.stopPropagation()">
+      <h4>New Income</h4>
+      <form [formGroup]="addForm" (ngSubmit)="addIncome()">
+        <select formControlName="user_id" class="input">
+          <option value="">Select User</option>
+          <option *ngFor="let u of users" [value]="u.id">{{ u.full_name }}</option>
+        </select>
+
+        <select formControlName="income_type" class="input">
+          <option value="">Select Income Type</option>
+          <option *ngFor="let t of incomeTypes" [value]="t.id">{{ t.name }}</option>
+        </select>
+
+        <input type="number" formControlName="amount" class="input" placeholder="Amount" />
+        <input type="date" formControlName="date_received" class="input" />
+
+        <label class="switch-row">
+          <span>Recurring</span>
+          <label class="switch small">
+            <input type="checkbox" formControlName="recurring" />
+            <span class="slider"></span>
+          </label>
+        </label>
+
+        <input type="text" formControlName="source_name" class="input" placeholder="Source" />
+        <input type="text" formControlName="notes" class="input" placeholder="Notes" />
+
+        <div class="popup-actions">
+          <button type="button" class="btn secondary" (click)="showAddPopup=false">Cancel</button>
+          <button type="submit" class="btn primary" [disabled]="addForm.invalid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" *ngIf="toastVisible">{{ toastMessage }}</div>
+</div>
