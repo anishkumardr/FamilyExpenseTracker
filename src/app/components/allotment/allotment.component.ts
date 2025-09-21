@@ -164,27 +164,6 @@ console.log('Popup allotments to add:', this.popupAllotments);
       console.error(err);
       this.errorMessage = 'Error saving allotments';
     }
-
-//     if (this.addForm.invalid) return;
-//     const val = this.addForm.value;
-// console.log('Add allotment form value:', val);
-//     try {
-//       const newAllotment = await this.allotmentService.addAllotment({
-//         category_id: val.category_id!,
-//         amountAllotted: val.amountAllotted!,
-//         category: this.getCategoryName(val.category_id!),
-//         month: val.month!,
-//         year: val.year!
-//       });
-//       this.allotments.unshift(newAllotment);
-//       this.showToast('Allotment added');
-//     } catch (err: any) {
-//       console.error('Add failed', err);
-//       this.showToast(err.message || 'Failed to add allotment');
-//     } finally {
-//       this.showAddPopup = false;
-//       this.addForm.reset();
-//     }
   }
   getCategoryName(id: string) {
     return this.categories.find(c => c.id === id)?.category_name || '';
