@@ -11,7 +11,7 @@
             <div class="name">{{ getUserName(i.user_id) }}</div>
             <div class="desc">
               {{ getIncomeTypeName(i.income_type || 0) }} |
-              {{ (i.amount ?? 0) | number:'1.0-2' }} |
+              {{ (i.amount) | number:'1.0-2' }} |
               {{ i.date_received || '' }}
             </div>
             <div class="notes" *ngIf="i.notes">Notes: {{ i.notes }}</div>
@@ -56,7 +56,7 @@
         <input type="text" [(ngModel)]="i.notes" class="input small" placeholder="Notes" />
 
         <div class="edit-actions">
-          <button (click)="saveEdit()" class="save-btn">Save</button>
+          <button (click)="saveEdit(i)" class="save-btn">Save</button>
           <button (click)="cancelEdit()" class="cancel-btn">Cancel</button>
         </div>
       </div>

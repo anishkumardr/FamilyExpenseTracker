@@ -2,11 +2,11 @@
 .page-title { font-size: 18px; margin-bottom: 12px; }
 
 .grid { display:flex; flex-direction:column; gap:10px; }
-.grid-item { background: #0f0f0f; padding:6px; border-radius:10px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
+.grid-item { background: #343434; padding:6px; border-radius:10px; box-shadow: 0 2px 8px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
 .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .left { /* allow left column to grow and shrink properly */ max-width: none; flex: 1 1 auto; min-width: 0; display:flex; flex-direction:column; justify-content:space-between; }
 .name{ font-weight:700; font-size:15px; white-space:normal; }
-.name.active { color: #bff7b5; }
+.name.active { color: #0d4602; }
 .name.inactive { color: #e4b5b5; }
 .desc{ color: #9aa3b2; font-size:12px; margin-top:4px; word-break:break-word; }
 

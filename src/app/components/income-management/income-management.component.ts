@@ -81,11 +81,11 @@ export class IncomeManagementComponent implements OnInit {
     this.showAddPopup = false;
   }
 
-  async saveEdit() {
+  async saveEdit(val: Income) {
     if (!this.editId || this.addForm.invalid) return;
 
     try {
-      const val = this.addForm.value;
+      //const val = this.addForm.value;
       console.log('Saving edit for income ID:', this.editId, val);
       const updated = await this.incomeService.updateIncome(this.editId, {
         user_id: val.user_id ?? '',

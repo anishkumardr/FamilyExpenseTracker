@@ -1,1 +1,106 @@
-<div class="page"><h3>Allotment</h3><p>Allotment grid & add action.</p></div>
+<div class="allot-root">
+  <div class="header">
+    <h3>Allotment - {{ currentMonthShortName }} {{ year }}</h3>
+   <div class="pagination">
+  <button class="nav-btn" [disabled]="!hasPrev">
+    <span class="material-icons">arrow_back_ios</span>
+  </button>
+  <div class="month-label">{{ currentMonthShortName }} {{ year }}</div>
+  <button class="nav-btn" [disabled]="!hasNext">
+    <span class="material-icons">arrow_forward_ios</span>
+  </button>
+</div>
+
+  </div>
+
+  <div class="grid">
+    <!-- Header row -->
+    <div class="grid-header">
+      <div>Category</div>
+      <div>Spent</div>
+      <div>Allotted</div>
+    </div>
+
+    <!-- Data rows -->
+    <div class="grid-item" *ngFor="let a of allotments">
+      
+      <!-- View mode -->
+      <div *ngIf="editId !== a.id" class="row">
+        <div class="col category">{{ a.category }}</div>
+        <div class="col spent">
+          <span class="amount">₹{{ a.amountSpent }}</span>
+          <div class="progress-bar">
+            <div class="progress" 
+                 [style.width.%]="(a.amountSpent / a.amountAllotted) * 100"
+                 [class.over]="a.amountSpent > a.amountAllotted"></div>
+          </div>
+        </div>
+        <div class="col allotted">
+          <span class="amount">₹{{ a.amountAllotted }}</span>
+          <button class="icon-btn" (click)="startEdit(a)">
+            <span class="material-icons">edit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Edit mode -->
+      <div *ngIf="editId === a.id" class="edit-row">
+        <div class="col category">{{ a.category }}</div>
+        <div class="col spent">
+          <span class="amount">₹{{ a.amountSpent }}</span>
+          <div class="progress-bar">
+            <div class="progress" 
+                 [style.width.%]="(a.amountSpent / tempAmount) * 100"
+                 [class.over]="a.amountSpent > tempAmount"></div>
+          </div>
+        </div>
+        <div class="col allotted">
+          <input type="number" [(ngModel)]="tempAmount" />
+          <div class="edit-actions">
+            <button class="save-btn" (click)="saveEdit(a)">Save</button>
+            <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer row -->
+    <div class="grid-footer">
+      <div>Total</div>
+      <div>₹{{ totalSpent }}</div>
+      <div>₹{{ totalAllotted }}</div>
+    </div>
+  </div>
+
+  <!-- Floating Add button -->
+  <button class="fab" (click)="openPopup()">
+    <span class="material-icons">add</span>
+  </button>
+
+  <!-- Popup for new allotments -->
+  <div class="popup-backdrop" *ngIf="showAddPopup" (click)="closePopup()">
+    <div class="popup" (click)="$event.stopPropagation()">
+      <h4>New Allotment</h4>
+      <form (ngSubmit)="addAllotment()">
+        <div class="popup-grid">
+          <div class="popup-row" *ngFor="let c of categories">
+            <span>{{ c.category_name }}</span>
+            <input type="number"
+                   [(ngModel)]="popupAllotments[c.id]"
+                   name="amount-{{c.id}}"
+                   min="0"
+                   placeholder="₹0" />
+          </div>
+        </div>
+
+        <div class="popup-actions">
+          <button type="button" class="btn secondary" (click)="closePopup()">Cancel</button>
+          <button type="submit" class="btn primary">Save</button>
+        </div>
+      </form>
+
+      <!-- Validation message -->
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    </div>
+  </div>
+</div>
