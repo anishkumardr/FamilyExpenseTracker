@@ -4,6 +4,23 @@
   padding-bottom: 80px;  // ✅ extra space for bottom menu height
   color: #eaeaea;
   font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  .income-info {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+
+  .available {
+    color: green;
+  }
+  .remaining {
+    color: blue;
+  }
+  .over {
+    color: red;
+    font-weight: bold;
+  }
+}
 .grid-header {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -32,6 +49,16 @@
     color: #e6e6e6;
     font-size: 14px;
   }
+  .col.category {
+  display: flex;
+  align-items: center; /* vertical alignment */
+  gap: 6px;            /* space between icon and text */
+}
+.icon-inline {
+  font-size: 20px;   /* smaller than default 24px for better fit */
+  line-height: 1;
+  vertical-align: middle;
+}
 .grid-footer {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;  /* same 3-column alignment */
@@ -101,6 +128,7 @@
     font-weight: 600;
     font-size: 14px;
     color: #fff;
+    padding-inline: 23px;   
   }
 }
 

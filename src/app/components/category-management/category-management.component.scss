@@ -6,8 +6,8 @@
 .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .left { /* allow left column to grow and shrink properly */ max-width: none; flex: 1 1 auto; min-width: 0; display:flex; flex-direction:column; justify-content:space-between; }
 .name{ font-weight:700; font-size:15px; white-space:normal; }
-.name.active { color: #0d4602; }
-.name.inactive { color: #e4b5b5; }
+.name.active { color: #3ba725; }
+.name.inactive { color: #f17272; }
 .desc{ color: #9aa3b2; font-size:12px; margin-top:4px; word-break:break-word; }
 
 .right { display:flex; align-items:center; gap:2px; width:auto; }

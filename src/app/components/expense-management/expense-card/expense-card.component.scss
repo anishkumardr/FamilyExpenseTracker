@@ -1,0 +1,49 @@
+.expense-card {
+  display: flex;
+  align-items: center;
+  background: #f8f8f8;
+  padding: 0.8rem;
+  border-radius: 0.8rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+
+  .icon {
+    background: #6200ea;
+    color: white;
+    padding: 0.6rem;
+    border-radius: 0.8rem;
+    margin-right: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      font-size: 1.5rem;
+    }
+  }
+
+  .details {
+    flex: 1;
+
+    .title {
+      font-weight: 600;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: #777;
+    }
+  }
+
+  .amount {
+    font-weight: 600;
+    margin-right: 0.5rem;
+  }
+
+  .edit-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #555;
+  }
+}

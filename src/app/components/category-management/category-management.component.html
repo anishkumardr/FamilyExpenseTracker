@@ -8,7 +8,7 @@
         <div class="left">
           <div class="text">
             <div class="name" [class.active]="c.status" [class.inactive]="!c.status">{{ c.category_name }}</div>
-            <div class="desc">{{ c.description }}</div>
+            <div class="desc">{{ c.description }}| <strong>{{ c.category_type }}</strong></div>
           </div>
          </div>
         <div class="right">
@@ -23,12 +23,16 @@
       <div *ngIf="editId === c.id" class="edit-row">
         <input #nameInput type="text" [value]="c.category_name" class="input" />
         <input #descInput type="text" [value]="c.description" class="input small" />
+        <select #typeSelect class="input small">
+        <option value="savings" [selected]="c.category_type==='savings'">Savings</option>
+        <option value="expense" [selected]="c.category_type==='expense'">Expense</option>
+        </select>
         <label class="switch">
           <input #statusInput type="checkbox" [checked]="c.status" />
           <span class="slider"></span>
         </label>
         <div class="edit-actions">
-          <button (click)="saveEdit(c, nameInput, descInput, statusInput)" class="save-btn">Save</button>
+          <button (click)="saveEdit(c, nameInput, descInput, statusInput,typeSelect)" class="save-btn">Save</button>
           <button (click)="cancelEdit()" class="cancel-btn">Cancel</button>
         </div>
       </div>
@@ -45,6 +49,10 @@
       <form [formGroup]="addForm" (ngSubmit)="addCategory()">
         <input formControlName="name" placeholder="Category name" class="input" />
         <input formControlName="description" placeholder="Description" class="input" />
+        <select formControlName="category_type" class="input">
+            <option value="savings">Savings</option>
+            <option value="expense">Expense</option>
+        </select>
         <label class="switch-row">
           <span>Status</span>
           <label class="switch">

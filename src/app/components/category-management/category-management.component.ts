@@ -24,7 +24,8 @@ export class CategoryManagementComponent implements OnInit {
   addForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
     description: new FormControl(''),
-    status: new FormControl(true)
+    status: new FormControl(true),
+    category_type: new FormControl<'savings' | 'expense'>('expense', [Validators.required])  // default to 'expense'
   });
 
   constructor(private categoryService: CategoryService) {}
@@ -52,7 +53,7 @@ export class CategoryManagementComponent implements OnInit {
     this.editId = cat.id;
   }
 
-  async saveEdit(cat: Category, nameInput: HTMLInputElement, descInput: HTMLInputElement, statusInput: HTMLInputElement) {
+  async saveEdit(cat: Category, nameInput: HTMLInputElement, descInput: HTMLInputElement, statusInput: HTMLInputElement, typeSelect: HTMLSelectElement) {
     try {
       console.log('Saving edit for category:', cat.id, nameInput.value, descInput.value, statusInput.checked);
       if (!nameInput.value.trim()) {
@@ -64,7 +65,8 @@ export class CategoryManagementComponent implements OnInit {
       const updated = await this.categoryService.updateCategory(cat.id, {
         category_name: nameInput.value.trim(),
         description: descInput.value,
-        status: statusInput.checked
+        status: statusInput.checked,
+        category_type: typeSelect.value as 'savings' | 'expense'
       });
       console.log('Category updated:', updated);
       this.categories = this.categories.map(c => (c.id === updated.id ? updated : c));
@@ -83,7 +85,7 @@ export class CategoryManagementComponent implements OnInit {
 
   /** Add actions */
   openAdd() {
-    this.addForm.reset({ name: '', description: '', status: true });
+    this.addForm.reset({ name: '', description: '', status: true, category_type: 'expense' });
     this.showAddPopup = true;
   }
 
@@ -94,6 +96,7 @@ export class CategoryManagementComponent implements OnInit {
     const newCat = await this.categoryService.addCategory({
       category_name: String(val.name),   // 👈 use DB field
       description: String(val.description || ''),
+      category_type :  val.category_type || 'expense',       // 👈 default to 'expense'
       status: !!val.status
     });
     this.categories.unshift(newCat);

@@ -52,7 +52,7 @@ if (error) throw error;
         {
           ...income,
           // Optional: you can attach family_id if needed
-          // family_id: this.authService.profile.family_id
+          family_id: this.authService.profile.family_id
         }
       ])
       .select()
@@ -122,6 +122,26 @@ async getIncomeTypes(): Promise<IncomeType[]> {
     console.error('Error fetching income types:', err);
     throw err;
   }
+}
+async getTotalIncome(month: number, year: number): Promise<number> {
+  if (!this.authService.familyId) throw new Error('No family_id');
+
+  // Build start and end dates for filtering
+  const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
+  const endDate = new Date(year, month, 0).toISOString().split('T')[0]; 
+  // e.g. 2025-09-30
+
+  const { data, error } = await this.supabase
+    .from('income')
+    .select('amount, date_received')
+    .eq('family_id', this.authService.familyId)
+    .gte('date_received', startDate)
+    .lte('date_received', endDate);
+
+  if (error) throw error;
+
+  // Sum the amounts
+  return (data || []).reduce((sum, inc) => sum + (inc.amount ?? 0), 0);
 }
 
 }

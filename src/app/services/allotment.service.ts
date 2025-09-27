@@ -53,6 +53,7 @@ console.log('Fetched allotments data:', allotmentsData);
       id: existing?.id ?? '',           // empty id for new entries
       category: cat.category_name,
       category_id: cat.id,
+      category_type: cat.category_type,
       amountAllotted: existing?.amount_allotted ?? 0,
       amountSpent: existing?.amount_spent ?? 0, // set to 0 if no record
       month,
@@ -90,6 +91,7 @@ console.log('Adding allotment:', allotment);
       id: data.id,
       category: allotment.category,
       category_id: allotment.category_id,
+        category_type: allotment.category_type,
       amountAllotted: data.amount_allotted,
       amountSpent: 0,
       month: data.month,
@@ -119,6 +121,7 @@ console.log('Adding allotment:', allotment);
       id: data.id,
       category_id: updates.category_id!,
       category: updates.category!,
+        category_type: updates.category_type!,
       amountAllotted: data.amount_allotted,
       amountSpent: updates.amountSpent ?? 0,
       month: data.month,
@@ -149,7 +152,7 @@ console.log('Adding allotment:', allotment);
 
     const { data, error } = await this.supabase
       .from('categories')
-      .select('id, category_name, status')
+      .select('id, category_name, status,category_type')
       .eq('family_id', this.authService.familyId)
       .eq('status', true)
       .order('category_name', { ascending: true });
@@ -162,4 +165,6 @@ console.log('Adding allotment:', allotment);
       ...item
     })) as Category[];
   }
+
+  
 }

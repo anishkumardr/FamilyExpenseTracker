@@ -1,0 +1,68 @@
+<div class="saving-container">
+
+  <!-- Top Card: Remaining Amount -->
+  <div class="top-card">
+    <div class="top-text">Remaining Amount</div>
+    <div class="top-amount" [ngClass]="{'low-remaining': remainingAmountPercent <= 20}">
+      ₹{{ remainingAmount }}
+    </div>
+    <div class="top-allotted">Allotted: ₹{{ allottedAmount }}</div>
+  </div>
+
+  <!-- Savings List -->
+  <div *ngFor="let group of savingsGrouped">
+    <div class="month-group">{{ group.month }}</div>
+
+    <div *ngFor="let saving of group.items" class="saving-card">
+      <div class="saving-left">
+        <img [src]="saving.icon || 'assets/icons/category/default_category_Icon.png'" class="category-icon" />
+        <div class="saving-details">
+          <div class="category-name">{{ saving.category_name }}</div>
+           <div class="saving-desc">  
+            <span class="material-icons icon-inline" *ngIf="saving.recurring == true">autorenew</span>
+            <span class="material-icons icon-inline" *ngIf="saving.recurring == false">schedule</span>
+             | {{ saving.comments }}  
+             <button class="icon-btn" (click)="onDeleteSaving(saving.id)">
+          |<span class="material-icons icon-inline">delete</span>
+        </button></div>
+        </div>
+      </div>
+      <div class="saving-right">
+        ₹{{ saving.amount }}
+        <button class="icon-btn" (click)="openPopup(saving)">
+          <span class="material-icons icon-inline">edit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Add Button -->
+  <button class="fab" (click)="openPopup()">
+    <span class="material-icons">add</span>
+  </button>
+
+  <!-- Manual Entry Popup -->
+  <div class="popup-backdrop" *ngIf="showPopup" (click)="closePopup()">
+    <div class="popup" (click)="$event.stopPropagation()">
+      <h3>{{ editingSaving ? 'Edit Saving' : 'Add Saving' }}</h3>
+
+      <form (ngSubmit)="saveSaving()">
+        <input type="number" placeholder="Amount" [(ngModel)]="model.amount" name="amount" required />
+        <select [(ngModel)]="model.category_id" name="category" required>
+          <option value="">Select Category</option>
+          <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}</option>
+        </select>
+        <input type="date" [(ngModel)]="model.date_saved" name="date_saved" />
+        <textarea placeholder="Comments" [(ngModel)]="model.comments" name="comments" required></textarea>
+        <label>
+          <input type="checkbox" [(ngModel)]="model.recurring" name="recurring" />
+          Recurring
+        </label>
+        <div class="actions">
+          <button type="button" class="btn cancel-btn" (click)="closePopup()">Cancel</button>
+          <button type="submit" class="btn save-btn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

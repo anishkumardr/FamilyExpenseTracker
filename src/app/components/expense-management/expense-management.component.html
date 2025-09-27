@@ -1,0 +1,60 @@
+<div class="expense-container">
+
+  <!-- Top Card: Remaining Amount -->
+  <div class="remaining-card" >
+  <div class="remaining-text">Remaining Amount</div>
+  <div class="remaining-amount" [ngClass]="{'low-remaining': remainingAmountPercent <= 20}">
+    ₹{{ remainingAmount }}
+  </div>
+</div>
+
+  <!-- Expenses Header -->
+  <div class="expenses-header">
+    <h3>All Expenses</h3>
+    <a href="#" class="view-all">View All</a>
+  </div>
+
+  <!-- Expenses List -->
+  <div *ngFor="let group of expensesGrouped">
+    <div class="date-group">{{ group.date }}</div>
+
+    <div *ngFor="let expense of group.items" class="expense-card" (dblclick)="editExpense(expense)">
+      <div class="expense-left">
+        <img [src]="expense.icon" class="category-icon" alt="icon">
+        <div class="expense-details">
+          <div class="category-name">{{ expense.category }}</div>
+          <div class="expense-desc">
+            <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'cash'">account_balance</span>
+          <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'upi'">payments</span>
+          <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'credit'">credit_card</span>
+          | {{ expense.description }} 
+          <span *ngIf="group.isCurrentMonth">
+            <span>|</span> <button class="icon-btn"  (click)="editExpense(expense)">
+            <span class="material-icons">edit</span>
+          </button>
+          <span>|</span> <button class="icon-btn"  (click)="onDeleteExpense(expense.id!)">
+            <span class="material-icons">delete</span>
+          </button>
+          </span> 
+        </div> 
+           
+          
+        </div>
+      </div>
+      <div class="expense-right">
+        ₹{{ expense.amount }}
+      </div>
+    </div>
+  </div>
+
+   <button class="fab" #fabBtn (click)="openPopup()">
+    <span class="material-icons">add</span>
+  </button>
+
+  <app-expense-popup
+  *ngIf="showPopup"
+  [categories]="categories"
+  [expense]="editingExpense"
+  (close)="closePopup()"
+></app-expense-popup>
+</div>

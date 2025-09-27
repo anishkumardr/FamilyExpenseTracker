@@ -1,0 +1,56 @@
+<div class="popup-backdrop" (click)="closePopup()">
+  <div class="popup" (click)="$event.stopPropagation()">
+
+    <!-- Switch -->
+    <div class="mode-switch">
+      <button [class.active]="entryMode==='easy'" (click)="switchMode('easy')">Easy Entry</button>
+      <button [class.active]="entryMode==='manual'" (click)="switchMode('manual')">Manual Entry</button>
+    </div>
+
+    <!-- EASY ENTRY -->
+    <div *ngIf="entryMode==='easy'" class="easy-entry">
+      <textarea [(ngModel)]="model.description" placeholder="Describe your expense..."></textarea>
+      <div class="actions">
+        <button class="btn secondary" (click)="closePopup()">Cancel</button>
+        <button class="btn primary" (click)="submitEasyEntry()">Submit</button>
+      </div>
+    </div>
+
+    <!-- MANUAL ENTRY -->
+    <form #expenseForm="ngForm" *ngIf="entryMode==='manual'" (ngSubmit)="submitManualEntry()" class="manual-entry">
+
+      <input type="number" [(ngModel)]="model.amount" name="amount" placeholder="Amount" class="input"  required #amountCtrl="ngModel" />
+<div *ngIf="amountCtrl.invalid && amountCtrl.touched" class="error">
+    Amount is required.
+  </div>
+     <select [(ngModel)]="model.category_id" name="category" class="input" required #categoryCtrl="ngModel">
+    <option value="">Select Category</option>
+    <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}</option>
+    </select>
+<div *ngIf="categoryCtrl.invalid && categoryCtrl.touched" class="error">
+    Category is required.
+  </div>
+      <select [(ngModel)]="model.payment_method" name="type" class="input" required #typeCtrl="ngModel">
+        <option value="">Payment Type</option>
+        <option value="upi">UPI</option>
+        <option value="credit">Credit Card</option>
+        <option value="cash">Cash</option>
+      </select>
+ <div *ngIf="typeCtrl.invalid && typeCtrl.touched" class="error">
+    Expense type is required.
+  </div>
+      <input type="date" [(ngModel)]="model.occurred_at" name="date" class="input" />
+
+      <input type="file" (change)="onFileSelected($event)" class="input" />
+
+      <textarea [(ngModel)]="model.description" name="note" placeholder="Notes" class="input" required #noteCtrl="ngModel"></textarea>
+<div *ngIf="noteCtrl.invalid && noteCtrl.touched" class="error">
+    Notes are required.
+  </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="closePopup()">Cancel</button>
+        <button type="submit" class="btn primary"  [disabled]="expenseForm.invalid">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

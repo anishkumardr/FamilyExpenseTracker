@@ -1,12 +1,23 @@
 <div class="allot-root">
   <div class="header">
-    <h3>Allotment - {{ currentMonthShortName }} {{ year }}</h3>
+    <h3>Allotment - {{ currentMonthShortName }} {{ currentYear }}</h3>
+    <div class="income-info">
+        <label class="available">
+      <span class="material-icons icon-inline" style="margin-bottom: 5px;">account_balance_wallet </span><span style="margin-bottom: 5px;"> {{ availableIncome }}</span>
+      </label>
+      <label class="remaining">
+      <span class="material-icons icon-inline">currency_rupee</span>
+      <span [ngClass]="{ 'over': remainingIncome < 0, 'normal': remainingIncome >= 0 }">
+         {{ remainingIncome }}
+      </span>
+        </label>
+    </div>
    <div class="pagination">
-  <button class="nav-btn" [disabled]="!hasPrev">
+  <button class="nav-btn" [disabled]="!hasPrev" (click)="goPrev()">
     <span class="material-icons">arrow_back_ios</span>
   </button>
-  <div class="month-label">{{ currentMonthShortName }} {{ year }}</div>
-  <button class="nav-btn" [disabled]="!hasNext">
+  <div class="month-label">{{ currentMonthShortName }} {{ currentYear }}</div>
+  <button class="nav-btn" [disabled]="!hasNext" (click)="goNext()">
     <span class="material-icons">arrow_forward_ios</span>
   </button>
 </div>
@@ -26,7 +37,10 @@
       
       <!-- View mode -->
       <div *ngIf="editId !== a.id" class="row">
-        <div class="col category">{{ a.category }}</div>
+        <div class="col category">
+            <span *ngIf="a.category_type=='expense'" class="material-icons icon-inline">receipt_long</span> 
+            <span *ngIf="a.category_type=='savings'" class="material-icons icon-inline">savings</span> 
+            {{ a.category }}</div>
         <div class="col spent">
           <span class="amount">₹{{ a.amountSpent }}</span>
           <div class="progress-bar">
@@ -37,7 +51,7 @@
         </div>
         <div class="col allotted">
           <span class="amount">₹{{ a.amountAllotted }}</span>
-          <button class="icon-btn" (click)="startEdit(a)">
+          <button class="icon-btn" *ngIf="canEdit && a.amountAllotted" (click)="startEdit(a)">
             <span class="material-icons">edit</span>
           </button>
         </div>
@@ -55,7 +69,7 @@
           </div>
         </div>
         <div class="col allotted">
-          <input type="number" [(ngModel)]="tempAmount" />
+          <input type="number" [(ngModel)]="tempAmount"  (ngModelChange)="onEditAmountChange($event)"/>
           <div class="edit-actions">
             <button class="save-btn" (click)="saveEdit(a)">Save</button>
             <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
@@ -73,7 +87,7 @@
   </div>
 
   <!-- Floating Add button -->
-  <button class="fab" (click)="openPopup()">
+  <button *ngIf="canEdit" class="fab" (click)="openPopup()">
     <span class="material-icons">add</span>
   </button>
 
@@ -82,14 +96,29 @@
     <div class="popup" (click)="$event.stopPropagation()">
       <h4>New Allotment</h4>
       <form (ngSubmit)="addAllotment()">
+          <div class="income-info" style="margin-bottom: 10px;">
+          
+          <label class="available">
+      <span class="material-icons" style="margin-bottom: 5px;">account_balance_wallet </span><span style="margin-bottom: 5px;"> {{ availableIncome - totalAllotted }}</span>
+      </label>
+      <label class="remaining">
+      <span class="material-icons">currency_rupee</span>
+      <span [ngClass]="{ 'remaining': remainingIncome >= 0, 'over': remainingIncome < 0 }">
+         ₹{{ remainingIncome }}
+      </span>
+        </label>
+           
+        </div>
         <div class="popup-grid">
-          <div class="popup-row" *ngFor="let c of categories">
-            <span>{{ c.category_name }}</span>
-            <input type="number"
+          <div class="popup-row" *ngFor="let c of allotments">
+            
+            <span *ngIf="!c.amountAllotted">{{ c.category }}</span>
+            <input type="number" *ngIf="!c.amountAllotted"
                    [(ngModel)]="popupAllotments[c.id]"
                    name="amount-{{c.id}}"
                    min="0"
-                   placeholder="₹0" />
+                   placeholder="₹0" (ngModelChange)="onAllotmentChange()"/>
+                   
           </div>
         </div>
 

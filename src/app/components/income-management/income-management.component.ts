@@ -5,13 +5,15 @@ import { Income } from '../../models/income.model';
 import { IncomeType } from '../../models/incometype.model';
 import { AppUser } from '../../models/app-user.model';
 import { IncomeService } from '../../services/income.service';
+import { SavingService } from '../../services/savings.service';
 
 @Component({
   selector: 'app-income-management',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule,FormsModule],
   templateUrl: './income-management.component.html',
-  styleUrls: ['./income-management.component.scss']
+  styleUrls: ['./income-management.component.scss'],
+  providers: [SavingService]
 })
 export class IncomeManagementComponent implements OnInit {
   incomes: Income[] = [];

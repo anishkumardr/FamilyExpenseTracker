@@ -1,0 +1,140 @@
+.expense-container {
+  padding: 20px;
+   padding: 12px;
+  padding-bottom: 80px; 
+  font-family: Arial, sans-serif;
+  background-color: #121212; /* Dark background for the page */
+  color: #e0e0e0;
+}
+
+.remaining-card {
+  background-color: #393535;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+
+  
+  .remaining-text {
+    font-size: 14px;
+    color: #ffffff;
+  }
+
+  .remaining-amount {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 5px;
+    color: #ffffff;
+    &.low-remaining {
+    color: #eb0d0d; // deep red when low
+  }
+
+  }
+  
+}
+
+.expenses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #ffffff; /* Header text on dark bg */
+  }
+  .view-all {
+    font-size: 14px;
+    color: #4fc3f7; /* Link color for visibility */
+    text-decoration: none;
+  }
+}
+
+.date-group {
+  font-size: 12px;
+  color: #aaa; /* Dates muted */
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.expense-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #474747; /* Keep card white */
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2); /* subtle shadow for depth */
+  color: #ffffff; /* Text black inside white card */
+
+  .expense-left {
+    display: flex;
+    align-items: center;
+
+    .category-icon {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      background-color: #c7b5b5; /* white background behind transparent icon */
+      border-radius: 50%;         /* optional circular shape */
+      padding: 5px;               /* optional spacing */
+    }
+    .icon-inline {
+      font-size: 20px;   /* smaller than default 24px for better fit */
+      line-height: 1;
+      vertical-align: middle;
+    }
+.payment-icon {
+  width: 20px;
+  height: 20px;
+  margin-left: 5px;
+  pointer-events: none;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  margin-left: 5px;
+  cursor: pointer;
+  vertical-align: middle;
+  color: #fff; 
+}
+.icon-btn .material-icons {
+  font-size: 16px; /* smaller size */
+}
+    .expense-details {
+      .category-name {
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .expense-type, .expense-desc {
+        font-size: 12px;
+        color: #ffffff;
+      }
+    }
+  }
+
+  .expense-right {
+    font-weight: bold;
+    font-size: 14px;
+  }
+}
+.fab {
+  position: fixed;
+  bottom: 96px;   // ✅ push above bottom menu (adjust if needed)
+  right: 20px;
+  background: #6a1b9a;
+  color: #fff;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  border: none;
+  z-index: 1000;  // higher than nav + grid
+}

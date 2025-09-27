@@ -13,7 +13,7 @@ import { MatDialog } from '@angular/material/dialog';
 @Component({
   selector: 'app-add-expense',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,FormsModule,ConfirmDialogComponent],
+  imports: [CommonModule, ReactiveFormsModule,FormsModule],
   templateUrl: './add-expense.component.html',
   styleUrls: ['./add-expense.component.scss']
 })

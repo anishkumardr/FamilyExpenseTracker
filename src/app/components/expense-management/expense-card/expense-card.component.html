@@ -1,0 +1,13 @@
+<div class="expense-card">
+  <div class="icon">
+    <span class="material-icons">{{ expense.icon }}</span>
+  </div>
+  <div class="details">
+    <div class="title">{{ expense.category }}</div>
+    <div class="note">{{ expense.note }}</div>
+  </div>
+  <div class="amount">₹ {{ expense.amount }}</div>
+  <button class="edit-btn" (click)="onEditClick()">
+    <span class="material-icons">edit</span>
+  </button>
+</div>
