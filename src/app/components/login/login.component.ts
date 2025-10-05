@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  email = '';
+  username = '';
   password = '';
   errorMessage = '';
   loading = false;
@@ -26,7 +26,7 @@ export class LoginComponent {
     this.loading = true;
 
     try {
-      const result = await this.authService.login(this.email, this.password);
+      const result = await this.authService.login(this.username, this.password);
       console.log('Login successful:', result);
       this.router.navigate(['/home']);
     } catch (err: any) {

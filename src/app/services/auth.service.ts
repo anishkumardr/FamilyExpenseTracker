@@ -33,9 +33,20 @@ export class AuthService {
   get isAdmin() {
     return this._profile?.is_admin === true;
   }
-  async login(email: string, password: string) {
+  async login(username: string, password: string) {
+
+     const { data: userRow, error: userError } = await this.supabase
+    .from('app_users')
+    .select('email')
+    .eq('username', username)
+    .single();
+
+    if (userError || !userRow) {
+      throw new Error('Invalid username');
+    }
+    
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email:userRow.email,
       password
     });
 

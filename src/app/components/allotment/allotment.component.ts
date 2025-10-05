@@ -112,9 +112,9 @@ goNext() {
         month ?? now.getMonth() + 1,
         year ?? now.getFullYear()
       );
-
+console.log('current month'+this.currentMonth + 'current year'+this.currentYear + ': month'+ (new Date().getMonth() + 1));
       this.canEdit = !(this.currentMonth < (new Date().getMonth() + 1) && this.currentYear <= new Date().getFullYear());
-      
+      console.log('Can edit allotments:', this.canEdit);
     } catch (err) {
       console.error('Error loading allotments:', err);
     } finally {

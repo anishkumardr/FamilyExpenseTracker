@@ -114,8 +114,8 @@
             
             <span *ngIf="!c.amountAllotted">{{ c.category }}</span>
             <input type="number" *ngIf="!c.amountAllotted"
-                   [(ngModel)]="popupAllotments[c.id]"
-                   name="amount-{{c.id}}"
+                   [(ngModel)]="popupAllotments[c.category_id]"
+                   name="amount-{{c.category_id}}"
                    min="0"
                    placeholder="₹0" (ngModelChange)="onAllotmentChange()"/>
                    
