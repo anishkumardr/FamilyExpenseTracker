@@ -50,15 +50,18 @@ export class SavingService {
   ).pipe(
     map((res: any) => {
         console.log('Fetched savings:', res);
-      const savings: Saving[] = res.data || [];
+      const savings: any[] = res.data || [];
       const grouped: { [month: string]: Saving[] } = {};
 
       savings.forEach(s => {
+        console.log('Processing saving:', s);
         const month = new Date(s.date_saved).toLocaleString('default', { month: 'long', year: 'numeric' });
         if (!grouped[month]) grouped[month] = [];
+        const saving = s as Saving;
+        console.log('Adding saving to group:', month, saving);
         grouped[month].push({
-          ...s,
-          category_name: s.category_name,
+          ...saving,
+          category_name: s.category.category_name,
           icon: s.icon || 'assets/icons/category/default_category_Icon.png'
         });
       });
@@ -104,9 +107,10 @@ console.log('Grouped savings:', grouped);
   if (!saving.id) {
     throw new Error('Saving ID is required for update');
   }
-
+console.log('Original saving data:', saving);
+const { category,category_name,icon, ...updateData } = saving as any; // exclude category object if present
   const savingToUpdate: Partial<Saving> = {
-    ...saving,
+    ...updateData,
     updated_at: new Date().toISOString()  // update timestamp
   };
 

@@ -53,7 +53,10 @@ export class SavingsManagementComponent implements OnInit {
   }
 
   loadSavings() {
-    this.savingService.getGroupedSavings().subscribe(res => this.savingsGrouped = res);
+    this.savingService.getGroupedSavings().subscribe(res => {
+      this.savingsGrouped = res;
+      console.log('Loaded savings:', this.savingsGrouped);
+    });
   }
 
   openPopup(saving?: Saving) {

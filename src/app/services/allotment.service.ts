@@ -46,16 +46,47 @@ export class AllotmentService {
 
   if (allotError) throw allotError;
 console.log('Fetched allotments data:', allotmentsData);
+
+const { data: expenseSpent, error: expenseError } = await this.supabase
+    .from('expense_management')
+    .select('category_id, amount')
+    .eq('family_id', familyId)
+    .gte('occurred_at', `${year}-${month}-01`)
+    .lte('occurred_at', `${year}-${month}-31`);
+console.log('Fetched expense spent data:', expenseSpent);
+    if (expenseError) throw expenseError;
+
+  const { data: savingsSpent, error: savingsError } = await this.supabase
+    .from('savings')
+    .select('category_id, amount')
+    .eq('family_id', familyId)
+    .gte('date_saved', `${year}-${month}-01`)
+    .lte('date_saved', `${year}-${month}-31`);
+
+  if (savingsError) throw savingsError;
+
+  // 🧮 Combine both into a map of total spent per category
+  const spentMap: { [key: string]: number } = {};
+
+  expenseSpent?.forEach(e => {
+    spentMap[e.category_id] = (spentMap[e.category_id] || 0) + (e.amount || 0);
+  });
+
+  savingsSpent?.forEach(s => {
+    spentMap[s.category_id] = (spentMap[s.category_id] || 0) + (s.amount || 0);
+  });
+
   // 3️⃣ Map categories to allotments
   const allotments: Allotment[] = categories!.map(cat => {
     const existing = allotmentsData?.find(a => a.category_id === cat.id);
+    const totalSpent = spentMap[cat.id] || 0;
     return {
       id: existing?.id ?? '',           // empty id for new entries
       category: cat.category_name,
       category_id: cat.id,
       category_type: cat.category_type,
       amountAllotted: existing?.amount_allotted ?? 0,
-      amountSpent: existing?.amount_spent ?? 0, // set to 0 if no record
+      amountSpent: totalSpent ?? 0, // set to 0 if no record
       month,
       year
     };

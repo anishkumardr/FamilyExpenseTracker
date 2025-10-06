@@ -257,7 +257,7 @@ console.log('Popup allotments to add:', this.popupAllotments);
             });
         }
       }
-      this.loadAllotments();
+      this.loadAllotments(this.currentMonth, this.currentYear);
       this.closePopup();
     } catch(err) {
       console.error(err);
