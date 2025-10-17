@@ -77,6 +77,35 @@
         </div>
       </div>
     </div>
+     <!-- + Add Category Row -->
+<div class="grid-item add-category-row" *ngIf="canEdit && showCategoryAddRow">
+  <div class="row align-center">
+    <div class="col category compact">
+      <mat-form-field appearance="outline" class="dark-select small-select" hideRequiredMarker>
+        <mat-label>Select or Add Category</mat-label>
+        <mat-select [(value)]="selectedCategoryId" panelClass="dark-select-panel">
+          <mat-option (click)="openAddCategoryPopup()">➕ Add New Category</mat-option>
+          <mat-option *ngFor="let c of filteredCategories" [value]="c.id">
+            {{ c.category_name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-icon-button color="primary" class="icon-btn save-btn" (click)="addSelectedCategory()">
+        <mat-icon>check</mat-icon>
+      </button>
+
+      <button mat-icon-button color="warn" class="icon-btn cancel-btn" (click)="toggleAddCategoryRow()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
+<app-category-add-popup
+  *ngIf="showAddCatagoryPopup"
+  (close)="handlePopupClose()"
+  (categoryAdded)="handleCategoryAdded($event)">
+</app-category-add-popup>
 
     <!-- Footer row -->
     <div class="grid-footer">
@@ -84,12 +113,14 @@
       <div>₹{{ totalSpent }}</div>
       <div>₹{{ totalAllotted }}</div>
     </div>
-  </div>
-
+   <div class="col category" *ngIf="!showCategoryAddRow">
+      <a (click)="toggleAddCategoryRow()" class="add-category-link">+ Add Category</a>
+    </div>
+ 
   <!-- Floating Add button -->
-  <button *ngIf="canEdit" class="fab" (click)="openPopup()">
+  <!-- <button *ngIf="canEdit" class="fab" (click)="openPopup()">
     <span class="material-icons">add</span>
-  </button>
+  </button> -->
 
   <!-- Popup for new allotments -->
   <div class="popup-backdrop" *ngIf="showAddPopup" (click)="closePopup()">

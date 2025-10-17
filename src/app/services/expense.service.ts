@@ -118,11 +118,16 @@ private subscription: any;
     return from(
     this.supabase
       .from('current_month_remaining')
-      .select('allotted_amount, spent_amount, remaining_amount')
+      .select('allotted_amount, spent_amount, remaining_amount, grocery_remaining_amount, dining_remaining_amount')
       .eq('family_id', this.authService.familyId)
       .single()
   ).pipe(
-    map(res => res.data)
+    map(res => ({
+      totalRemaining: res.data?.remaining_amount ?? 0,
+      groceryRemaining: res.data?.grocery_remaining_amount ?? 0,
+      diningRemaining: res.data?.dining_remaining_amount ?? 0
+
+    }))
   );
   }
 

@@ -28,11 +28,15 @@
         <option value="expense" [selected]="c.category_type==='expense'">Expense</option>
         </select>
         <label class="switch">
+        <input #isGlobalInput type="checkbox" [checked]="c.is_global" />
+        <span class="slider"></span>
+      </label>
+        <label class="switch">
           <input #statusInput type="checkbox" [checked]="c.status" />
           <span class="slider"></span>
         </label>
         <div class="edit-actions">
-          <button (click)="saveEdit(c, nameInput, descInput, statusInput,typeSelect)" class="save-btn">Save</button>
+          <button (click)="saveEdit(c, nameInput, descInput, statusInput,typeSelect,isGlobalInput)" class="save-btn">Save</button>
           <button (click)="cancelEdit()" class="cancel-btn">Cancel</button>
         </div>
       </div>
@@ -53,6 +57,13 @@
             <option value="savings">Savings</option>
             <option value="expense">Expense</option>
         </select>
+        <label class="switch-row">
+        <span>Is Global</span>
+        <label class="switch">
+          <input type="checkbox" formControlName="is_global" />
+          <span class="slider"></span>
+        </label>
+      </label>
         <label class="switch-row">
           <span>Status</span>
           <label class="switch">

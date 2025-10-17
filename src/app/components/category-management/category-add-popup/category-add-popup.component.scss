@@ -1,0 +1,71 @@
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+
+  .popup {
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    color: #fff;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 6px;
+        background: #2a2a2a;
+        color: #fff;
+        border: 1px solid #444;
+        border-radius: 4px;
+      }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+
+      button {
+        flex: 1;
+        margin: 0 5px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .cancel {
+        background: #555;
+        color: #fff;
+      }
+
+      button:not(.cancel) {
+        background: #1976d2;
+        color: #fff;
+      }
+    }
+  }
+}

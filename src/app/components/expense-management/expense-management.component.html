@@ -1,10 +1,25 @@
 <div class="expense-container">
 
   <!-- Top Card: Remaining Amount -->
-  <div class="remaining-card" >
-  <div class="remaining-text">Remaining Amount</div>
-  <div class="remaining-amount" [ngClass]="{'low-remaining': remainingAmountPercent <= 20}">
-    ₹{{ remainingAmount }}
+ <div class="remaining-card">
+  <div class="cash-summary-row">
+    <div class="cash-item">
+      <span class="material-icons cash-icon">account_balance_wallet</span>
+      <!-- <div class="cash-label">Total Remaining</div> -->
+      <div class="cash-amount">₹{{ totalRemaining }}</div>
+    </div>
+
+    <div class="cash-item">
+      <span class="material-icons cash-icon">shopping_cart</span>
+      <!-- <div class="cash-label">Grocery</div> -->
+      <div class="cash-amount">₹{{ groceryAmount }}</div>
+    </div>
+
+    <div class="cash-item">
+      <span class="material-icons cash-icon">restaurant</span>
+      <!-- <div class="cash-label">Dining</div> -->
+      <div class="cash-amount">₹{{ diningAmount }}</div>
+    </div>
   </div>
 </div>
 

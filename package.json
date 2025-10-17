@@ -24,6 +24,7 @@
     "@angular/service-worker": "^19.2.0",
     "@supabase/supabase-js": "^2.57.4",
     "material-icons": "^1.13.14",
+    "ngx-mat-select-search": "^8.0.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

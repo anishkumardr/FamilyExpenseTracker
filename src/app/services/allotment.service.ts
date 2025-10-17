@@ -26,15 +26,24 @@ export class AllotmentService {
     // Using Supabase join to fetch category name + allotted + spent
     if (!this.authService.familyId) throw new Error('No family_id');
 
-  // 1️⃣ Fetch all categories for this family
-  const { data: categories, error: catError } = await this.supabase
+  // 1️⃣ Fetch all global categories for this family
+  const { data: globalCategories, error: catError } = await this.supabase
     .from('categories')
     .select('*')
     .eq('family_id', this.authService.familyId)
+    .eq('is_global', true)
     .eq('status', true)
     .order('category_name', { ascending: true });
 
   if (catError) throw catError;
+
+   const { data: familyCats, error: familyErr } = await this.supabase
+    .from('categories')
+    .select('*')
+    .eq('family_id', familyId)
+    .eq('status', true)
+    .order('category_name', { ascending: true });
+  if (familyErr) throw familyErr;
 
   // 2️⃣ Fetch existing allotments for this month/year
   const { data: allotmentsData, error: allotError } = await this.supabase
@@ -47,12 +56,34 @@ export class AllotmentService {
   if (allotError) throw allotError;
 console.log('Fetched allotments data:', allotmentsData);
 
+// 3️⃣ Merge and remove duplicates (preference: family category)
+  const mergedCategoriesMap = new Map<string, any>();
+
+// Add global categories first
+(globalCategories || []).forEach(cat => {
+  if (cat && cat.id) {
+    mergedCategoriesMap.set(cat.id, cat);
+  }
+});
+console.log('Global categories map:', mergedCategoriesMap);
+// Then overlay allotments (they have priority)
+(allotmentsData || []).forEach(allot => {
+  if (allot && allot.category_id) {
+    // Find matching global category to get its details
+    const matchingCategory = familyCats?.find(c => c.id === allot.category_id);
+    mergedCategoriesMap.set(allot.category_id,matchingCategory);
+  }
+});
+
+const categories = Array.from(mergedCategoriesMap.values());
+console.log('Merged categories:', categories);
+const lastDay = new Date(year, month, 0).getDate();
 const { data: expenseSpent, error: expenseError } = await this.supabase
     .from('expense_management')
     .select('category_id, amount')
     .eq('family_id', familyId)
     .gte('occurred_at', `${year}-${month}-01`)
-    .lte('occurred_at', `${year}-${month}-31`);
+    .lte('occurred_at', `${year}-${month}-${lastDay}`);
 console.log('Fetched expense spent data:', expenseSpent);
     if (expenseError) throw expenseError;
 
@@ -61,7 +92,7 @@ console.log('Fetched expense spent data:', expenseSpent);
     .select('category_id, amount')
     .eq('family_id', familyId)
     .gte('date_saved', `${year}-${month}-01`)
-    .lte('date_saved', `${year}-${month}-31`);
+    .lte('date_saved', `${year}-${month}-${lastDay}`);
 
   if (savingsError) throw savingsError;
 

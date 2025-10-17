@@ -25,6 +25,7 @@ export class CategoryManagementComponent implements OnInit {
     name: new FormControl('', [Validators.required]),
     description: new FormControl(''),
     status: new FormControl(true),
+    is_global: new FormControl(false),
     category_type: new FormControl<'savings' | 'expense'>('expense', [Validators.required])  // default to 'expense'
   });
 
@@ -53,9 +54,9 @@ export class CategoryManagementComponent implements OnInit {
     this.editId = cat.id;
   }
 
-  async saveEdit(cat: Category, nameInput: HTMLInputElement, descInput: HTMLInputElement, statusInput: HTMLInputElement, typeSelect: HTMLSelectElement) {
+  async saveEdit(cat: Category, nameInput: HTMLInputElement, descInput: HTMLInputElement, statusInput: HTMLInputElement, typeSelect: HTMLSelectElement,isGlobalInput : HTMLInputElement) {
     try {
-      console.log('Saving edit for category:', cat.id, nameInput.value, descInput.value, statusInput.checked);
+      console.log('Saving edit for category:', cat.id, nameInput.value, descInput.value, statusInput.checked, isGlobalInput.checked);
       if (!nameInput.value.trim()) {
         alert('Name cannot be empty');
         return;
@@ -66,6 +67,7 @@ export class CategoryManagementComponent implements OnInit {
         category_name: nameInput.value.trim(),
         description: descInput.value,
         status: statusInput.checked,
+        is_global : isGlobalInput.checked,
         category_type: typeSelect.value as 'savings' | 'expense'
       });
       console.log('Category updated:', updated);
@@ -85,7 +87,7 @@ export class CategoryManagementComponent implements OnInit {
 
   /** Add actions */
   openAdd() {
-    this.addForm.reset({ name: '', description: '', status: true, category_type: 'expense' });
+    this.addForm.reset({ name: '', description: '', status: true, category_type: 'expense', is_global: false });
     this.showAddPopup = true;
   }
 
@@ -97,6 +99,7 @@ export class CategoryManagementComponent implements OnInit {
       category_name: String(val.name),   // 👈 use DB field
       description: String(val.description || ''),
       category_type :  val.category_type || 'expense',       // 👈 default to 'expense'
+      is_global : val.is_global || false,
       status: !!val.status
     });
     this.categories.unshift(newCat);

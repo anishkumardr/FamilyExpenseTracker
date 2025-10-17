@@ -248,3 +248,191 @@
 }
 
 }
+.add-category-link {
+  color: #4caf50;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  &:hover {
+    color: #81c784;
+  }
+}
+
+.category-search-input,
+.category-select {
+  background: #c12323;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+  margin-right: 6px;
+}
+.add-category-row {
+  display: flex;
+  align-items: center;
+  padding: 0 !important;
+  font-size: 13px;
+  margin-top: 4px;
+
+  .category {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.dark-select.small-select {
+  width: 200px;
+  margin-left: 18px;
+  height: 32px;
+  color: #fff;
+
+  ::ng-deep .mat-mdc-form-field-flex {
+    height: 34px !important;
+    min-height: 34px !important;
+    padding: 0 8px !important;
+    display: flex;
+    align-items: center; // ✅ center content vertically
+  }
+  ::ng-deep .dark-select.small-select .mat-mdc-form-field-flex {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 8px !important;
+}
+::ng-deep .ngx-mat-select-search input {
+  color: #ffffff !important;          // text color
+  caret-color: #ffffff !important;    // cursor color
+  background-color: #1e1e1e !important; // match the select background
+  font-size: 13px;
+  padding-left: 8px;                  // optional padding
+}
+  ::ng-deep .ngx-mat-select-search input::placeholder {
+  color: #ffffff !important;
+  opacity: 0.7; // lighter for placeholder
+}
+::ng-deep .ngx-mat-select-search input.mat-mdc-input-element {
+    color: #ffffff !important;          // text color
+    caret-color: #ffffff !important;    // cursor color
+    background-color: #1e1e1e !important; // match select background
+    font-size: 13px;
+    padding-left: 8px;                  // optional left padding
+}
+
+::ng-deep .ngx-mat-select-search input.mat-mdc-input-element::placeholder {
+    color: #ffffff !important;          // placeholder color
+    opacity: 0.7;
+}
+::ng-deep .dark-select.small-select .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;  // ✅ hides that auto-generated spacer
+}
+::ng-deep .ngx-mat-select-search {
+  padding-left: 8px;  // ✅ add some space on the left
+  padding-right: 8px; // optional, keep padding on right
+  height: 32px;       // match select height
+  box-sizing: border-box;
+  color: #fff;        // text color for dark theme
+  background-color: #1e1e1e; // same as select background
+  border-radius: 4px; // optional rounded edges
+  font-size: 13px;
+}
+  ::ng-deep .mat-mdc-select-trigger {
+    height: 32px !important;
+    line-height: 32px !important;
+    display: flex;
+    align-items: center; // ✅ vertical align label + value
+    font-size: 13px;
+  }
+
+  ::ng-deep .mat-mdc-floating-label {
+    font-size: 12px !important;
+    top: 0; // optional adjust
+    transform: translateY(50%); // vertically center when not floating
+    color: #fff !important;
+  }
+ ::ng-deep .mat-mdc-form-field-outline,
+  .mat-mdc-form-field-outline-thick {
+    color: rgba(255, 255, 255, 0.7); // Outline color
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+  ::ng-deep .mat-mdc-select-arrow {
+    color: #fff; // Down arrow color
+  }
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: #1e1e1e !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+  }
+
+}
+
+::ng-deep .dark-select-panel {
+  background-color: #2a2a2a !important;
+  color: #fff !important;
+
+  .mat-mdc-option {
+    color: #fff !important;
+  }
+
+  .mat-mdc-option.mdc-list-item--selected {
+    background-color: #444 !important;
+  }
+
+  .mat-mdc-option:hover {
+    background-color: #333 !important;
+  }
+}
+/* Make search field text white in dark theme */
+::ng-deep .dark-select-panel .ngx-mat-select-search input {
+    color: #ffffff !important;          /* text color */
+    caret-color: #ffffff !important;    /* cursor color */
+    background-color: #1e1e1e !important; /* match select background */
+}
+
+/* Placeholder color */
+::ng-deep .dark-select-panel .ngx-mat-select-search input::placeholder {
+    color: #ffffff !important;
+    opacity: 0.7;
+}
+/* Ensure selected text inside mat-select is white */
+::ng-deep .dark-select.small-select .mat-mdc-select-value-text {
+  color: #ffffff !important;
+}
+
+/* Also cover the placeholder (before selection) */
+::ng-deep .dark-select.small-select .mat-mdc-select-placeholder {
+  color: #ffffff !important;
+  opacity: 0.8;
+}
+
+/* When focused or active */
+::ng-deep .dark-select.small-select .mat-mdc-select-trigger {
+  color: #ffffff !important;
+}
+
+/* Optional: Make selected item in dropdown clearly visible */
+::ng-deep .dark-select-panel .mat-mdc-option.mdc-list-item--selected .mdc-list-item__primary-text {
+  color: #ffffff !important;
+  font-weight: 500;
+}
+::ng-deep .dark-select.small-select.mat-focused .mat-mdc-form-field-outline-thick {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+.icon-btn {
+  height: 32px !important;
+  width: 32px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px !important;
+
+  mat-icon {
+    font-size: 18px !important;
+  }
+}
+
+.cancel-btn {
+  color: #e57373 !important;
+}
+.save-btn { color:rgb(39, 198, 68); }

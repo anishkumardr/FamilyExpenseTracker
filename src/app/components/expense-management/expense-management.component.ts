@@ -17,10 +17,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class ExpenseManagementComponent {
   expensesGrouped: ExpenseGroup[] = [];
-  remainingAmount: number = 0;
+  
+  totalRemaining = 0;
+  groceryAmount = 0;
+  diningAmount = 0;
   allottedAmount: number = 0;
   remainingAmountPercent: number = 100;
-categories: { id: string, category_name: string }[] = [];
+  categories: { id: string, category_name: string }[] = [];
   showPopup = false;
   editingExpense: Expense | null = null;
   currentMonth = new Date().getMonth() + 1;
@@ -50,12 +53,14 @@ categories: { id: string, category_name: string }[] = [];
 
   loadRemainingAmount() {
     this.expenseService.getRemainingAmount().subscribe(res => {
-      this.remainingAmount = res.remaining_amount;
+      this.totalRemaining = res.totalRemaining;
+      this.groceryAmount = res.groceryRemaining;
+      this.diningAmount = res.diningRemaining;
     this.allottedAmount = res.allotted_amount;
 
     // calculate percentage
     this.remainingAmountPercent = this.allottedAmount
-      ? (this.remainingAmount / this.allottedAmount) * 100
+      ? (this.totalRemaining / this.allottedAmount) * 100
       : 100;
     });
   }

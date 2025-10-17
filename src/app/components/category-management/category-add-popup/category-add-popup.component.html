@@ -1,0 +1,31 @@
+<div class="popup-backdrop">
+  <div class="popup">
+    <h3>Add New Category</h3>
+
+    <div class="form-group">
+      <label>Category Name</label>
+      <input [(ngModel)]="categoryName" placeholder="Enter category name" />
+    </div>
+    <div class="form-group">
+      <label>Category Description</label>
+      <input [(ngModel)]="description" placeholder="Enter category desc" />
+    </div>
+    <div class="form-group">
+      <label>Type</label>
+      <select [(ngModel)]="categoryType">
+        <option value="expense">Expense</option>
+        <option value="income">Income</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label><input type="checkbox" [(ngModel)]="isGlobal" /> Is Global</label>
+    </div>
+    
+
+    <div class="actions">
+      <button (click)="addCategory()">Save</button>
+      <button class="cancel" (click)="cancel()">Cancel</button>
+    </div>
+  </div>
+</div>

@@ -9,31 +9,59 @@
 
 .remaining-card {
   background-color: #393535;
-  padding: 20px;
+  padding: 16px 10px;
   border-radius: 12px;
-  text-align: center;
-  margin-bottom: 20px;
   color: #ffffff;
-
-  
-  .remaining-text {
-    font-size: 14px;
-    color: #ffffff;
-  }
-
-  .remaining-amount {
-    font-size: 28px;
-    font-weight: bold;
-    margin-top: 5px;
-    color: #ffffff;
-    &.low-remaining {
-    color: #eb0d0d; // deep red when low
-  }
-
-  }
-  
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  margin-bottom: 20px;
 }
 
+/* row wrapper */
+.cash-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* ensures wrapping on small screens */
+  text-align: center;
+}
+
+/* individual blocks */
+.cash-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+/* icon styling */
+.cash-icon {
+  font-size: 26px;
+  margin-bottom: 4px;
+  color: #4fc3f7;
+}
+
+/* label + amount */
+.cash-label {
+  font-size: 13px;
+  color: #cccccc;
+}
+
+.cash-amount {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* responsive tweaks for mobile */
+@media (max-width: 480px) {
+  .cash-summary-row {
+    justify-content: space-around;
+  }
+  .cash-item {
+    min-width: 90px;
+  }
+}
 .expenses-header {
   display: flex;
   justify-content: space-between;

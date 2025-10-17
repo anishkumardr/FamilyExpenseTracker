@@ -7,7 +7,13 @@ import { Allotment } from '../../models/allotment.model';
 import { Category } from '../../models/category.model';
 import { IncomeService } from '../../services/income.service';
 import { MatIconModule } from "@angular/material/icon";
-
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MatDividerModule } from '@angular/material/divider';
+import { CategoryAddPopupComponent } from '../category-management/category-add-popup/category-add-popup.component';
 
 interface AllotmentRow {
   id: string;
@@ -20,7 +26,10 @@ interface AllotmentRow {
 @Component({
   selector: 'app-allotment',
   standalone: true,
-  imports: [FormsModule, CommonModule, MatIconModule],
+  imports: [FormsModule, CommonModule, MatIconModule,MatFormFieldModule,
+    MatSelectModule,
+    MatInputModule,
+    MatButtonModule,NgxMatSelectSearchModule,MatDividerModule,CategoryAddPopupComponent],
   templateUrl: './allotment.component.html',
   styleUrls: ['./allotment.component.scss']
 })
@@ -31,7 +40,7 @@ export class AllotmentComponent {
   currentMonthShortName = this.getMonthShortName(this.currentMonth);
   hasPrev = true;
   hasNext = true;
-
+categoryFilter: string = '';
  allotments: Allotment[] = [];
   categories: Category[] = [];
   loading = false;
@@ -39,12 +48,18 @@ export class AllotmentComponent {
   tempAmount: number = 0;
   // popup state
    showAddPopup  = false;
+   showAddCatagoryPopup = false;
   popupAllotments: { [key: string]: number } = {};
   errorMessage: string = '';
   toastMessage = '';
   toastVisible = false;
   availableIncome = 0;   // total income fetched from DB
   hasAllotmentData = true; // whether any allotment data exists for the month
+// --- Add Category Row State ---
+showCategoryAddRow = false;
+newCategorySearch = '';
+filteredCategories: Category[] = [];
+selectedCategoryId: string | null = null;
 
   addForm = new FormGroup({
     category_id: new FormControl<string | null>(null, Validators.required),
@@ -286,4 +301,72 @@ console.log('Popup allotments to add:', this.popupAllotments);
   const date = new Date(2000, monthNumber - 1, 1); // Use any year and day
   return date.toLocaleString(locale, { month: 'short' });
 }
+
+toggleAddCategoryRow() {
+  this.showCategoryAddRow = !this.showCategoryAddRow;
+  if (this.showCategoryAddRow) {
+    console.log('toggleAddCategoryRow - Allotments:', this.allotments);
+    console.log('toggleAddCategoryRow - Categories:', this.categories);
+    this.filteredCategories = this.categories.filter(
+      c => !this.allotments.some(a => a.category_id === c.id)
+    );
+    console.log('toggleAddCategoryRow - filteredCategories:', this.filteredCategories);
+
+  } else {
+    this.newCategorySearch = '';
+    this.selectedCategoryId = null;
+  }
+}
+
+filterCategories() {
+  const term = this.newCategorySearch.toLowerCase();
+  this.filteredCategories = this.categories.filter(
+    c =>
+      !this.allotments.some(a => a.category_id === c.id) &&
+      c.category_name.toLowerCase().includes(term)
+  );
+}
+
+async addSelectedCategory() {
+  if (!this.selectedCategoryId) return;
+
+  const cat = this.categories.find(c => c.id === this.selectedCategoryId);
+  if (!cat) return;
+
+  try {
+     this.allotments.push( {
+      id: '',           // empty id for new entries
+      category: cat.category_name,
+      category_id: cat.id,
+      category_type: cat.category_type,
+      amountAllotted:  0,
+      amountSpent:  0, // set to 0 if no record
+      month: this.currentMonth,
+      year: this.currentYear
+    });
+    // await this.allotmentService.addAllotment(newAllotment);
+    // this.loadAllotments(this.currentMonth, this.currentYear);
+    this.showToast(`Category "${cat.category_name}" added`);
+  } catch (err) {
+    console.error('Failed to add category', err);
+    this.showToast('Error adding category');
+  } finally {
+    this.toggleAddCategoryRow();
+  }
+}
+
+ openAddCategoryPopup() {
+    this.showAddCatagoryPopup = true;
+  }
+
+  handlePopupClose() {
+    this.showAddCatagoryPopup = false;
+  }
+
+  async handleCategoryAdded(newCategory: any) {
+    this.showAddCatagoryPopup = false;
+    await this.loadCategories(); // reload
+   
+    this.selectedCategoryId = newCategory?.id || null;
+  }
 }
