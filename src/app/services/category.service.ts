@@ -38,6 +38,7 @@ export class CategoryService {
     if (!this.authService.profile?.family_id) {
     throw new Error('No family_id available');
   }
+  console.log('familyId found:', this.authService.profile.family_id);
     const duplicate = await this.isDuplicateName(category.category_name);
   if (duplicate) {
     throw new Error('Category name already exists');

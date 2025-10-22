@@ -70,7 +70,7 @@ private subscription: any;
       map(expenses => {
         const grouped: { [key: string]: Expense[] } = {};
         expenses.forEach(e => {
-            console.log('Processing expense:', e);
+          
             e.icon = "assets/icons/category/default_category_Icon.png";// + (e.category?.toLowerCase().replace(/\s+/g, '_') || 'default_category_Icon') + ".png";
           const dateKey = new Date(e.occurred_at).toDateString();
           if (!grouped[dateKey]) grouped[dateKey] = [];
@@ -94,7 +94,6 @@ private subscription: any;
     label = date;
   }
 
-  console.log('Expense date:', expenseDate, 'Label:', expenseDate.getMonth() === today.getMonth() && expenseDate.getFullYear() === today.getFullYear());
   return {
     date: label,
     isCurrentMonth: expenseDate.getMonth() === today.getMonth() && expenseDate.getFullYear() === today.getFullYear(),

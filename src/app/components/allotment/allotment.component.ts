@@ -46,6 +46,7 @@ categoryFilter: string = '';
   loading = false;
   editId: string | null = null;
   tempAmount: number = 0;
+  tempAmounts: { [key: string]: number } = {};
   // popup state
    showAddPopup  = false;
    showAddCatagoryPopup = false;
@@ -139,8 +140,9 @@ console.log('current month'+this.currentMonth + 'current year'+this.currentYear 
 
    startEdit(allotment: Allotment) {
     console.log('Editing allotment:', allotment);
-    this.editId = allotment.id;
+    this.editId = allotment.category_id;
     this.tempAmount = Number(allotment.amountAllotted) || 0;
+    this.tempAmounts[allotment.category_id] = Number(allotment.amountAllotted) || 0;
     // this.addForm.setValue({
     //   category_id: allotment.category_id,
     //   amountAllotted: allotment.amountAllotted,
@@ -174,24 +176,50 @@ console.log('current month'+this.currentMonth + 'current year'+this.currentYear 
     }
   }
   
- onEditAmountChange(value: number | string) {
-    this.tempAmount = Number(value) || 0;
-    // remainingIncome getter will reflect this automatically
+ onEditAmountChange(value: number, allotment: Allotment ) {
+    this.tempAmounts[allotment.category_id] = value;
   }
+
   async saveEdit(val: Allotment) {
     console.log('Save edit called with:',this.addForm, val,this.editId,this.tempAmount);
     if (!this.editId) return;
 console.log('Saving edit for allotment:', this.editId, val);
     try {
 
-      if (this.remainingIncome < 0) {
-      this.errorMessage = `Allotments exceed available income (Remaining: ₹${this.remainingIncome})`;
-      return;
-    }
-    val.amountAllotted = this.tempAmount;
-      const updated = await this.allotmentService.updateAllotment(this.editId, val);
-      this.allotments = this.allotments.map(a => (a.id === updated.id ? updated : a));
-      this.showToast('Allotment updated');
+        if (this.remainingIncome < 0) {
+        this.errorMessage = `Allotments exceed available income (Remaining: ₹${this.remainingIncome})`;
+        return;
+        }
+      if(val.id===''){
+        // new allotment added via edit row
+        const addedAmount = this.tempAmounts[val.category_id]??val.amountAllotted;
+        console.log('Saving added amount for', val.category, '=>', addedAmount);
+        const added = await this.allotmentService.addAllotment(
+              {
+          category_id: val.category_id,
+          amountAllotted: addedAmount,
+          category: this.getCategoryName(val.category_id),
+          category_type: this.categories.find(c => c.id === val.category_id)?.category_type || '',
+          month: this.currentMonth,
+          year: this.currentYear!
+              });
+              if(added.id)
+              {
+                this.showToast('Allotment added');
+                this.allotments = this.allotments.map(a => (a.category_id === added.category_id ? added : a));
+              }
+              
+      }
+      else
+      {
+        const updatedAmount = this.tempAmounts[val.category_id];
+        console.log('Saving updated amount for', val.category, '=>', updatedAmount);
+        val.amountAllotted = updatedAmount;
+        const updated = await this.allotmentService.updateAllotment(val.id, val);
+        this.allotments = this.allotments.map(a => (a.id === updated.id ? updated : a));
+        this.showToast('Allotment updated');
+      }
+    
     } catch (err: any) {
       console.error('Update failed', err);
       this.showToast(err.message || 'Failed to update allotment');

@@ -36,7 +36,7 @@
     <div class="grid-item" *ngFor="let a of allotments">
       
       <!-- View mode -->
-      <div *ngIf="editId !== a.id" class="row">
+      <div *ngIf="editId !== a.category_id" class="row">
         <div class="col category">
             <span *ngIf="a.category_type=='expense'" class="material-icons icon-inline">receipt_long</span> 
             <span *ngIf="a.category_type=='savings'" class="material-icons icon-inline">savings</span> 
@@ -51,28 +51,29 @@
         </div>
         <div class="col allotted">
           <span class="amount">₹{{ a.amountAllotted }}</span>
-          <button class="icon-btn" *ngIf="canEdit && a.amountAllotted" (click)="startEdit(a)">
+          <button class="icon-btn" *ngIf="canEdit" (click)="startEdit(a)">
             <span class="material-icons">edit</span>
           </button>
         </div>
       </div>
 
       <!-- Edit mode -->
-      <div *ngIf="editId === a.id" class="edit-row">
+      <div *ngIf="editId === a.category_id" class="edit-row">
         <div class="col category">{{ a.category }}</div>
         <div class="col spent">
           <span class="amount">₹{{ a.amountSpent }}</span>
           <div class="progress-bar">
             <div class="progress" 
-                 [style.width.%]="(a.amountSpent / tempAmount) * 100"
-                 [class.over]="a.amountSpent > tempAmount"></div>
+                 [style.width.%]="(a.amountSpent / tempAmounts[a.category_id]) * 100"
+                 [class.over]="a.amountSpent > tempAmounts[a.category_id]"></div>
           </div>
         </div>
         <div class="col allotted">
-          <input type="number" [(ngModel)]="tempAmount"  (ngModelChange)="onEditAmountChange($event)"/>
+          <input type="number" [(ngModel)]="tempAmounts[a.category_id]"  (ngModelChange)="onEditAmountChange($event,a)"/>
           <div class="edit-actions">
-            <button class="save-btn" (click)="saveEdit(a)">Save</button>
-            <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+            <button mat-icon-button color="primary" class="icon-btn" (click)="saveEdit(a)"><span class="material-icons">check</span></button>
+            <button mat-icon-button class="icon-btn" (click)="cancelEdit()">
+              <span class="material-icons">close</span></button>
           </div>
         </div>
       </div>

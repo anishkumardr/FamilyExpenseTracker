@@ -84,3 +84,28 @@
     }
   }
 }
+.category-chips, .payment-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+button.chip, .payment-buttons button {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 6px 14px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button.chip:hover, .payment-buttons button:hover {
+  background-color: #e3f2fd;
+}
+
+button.selected, .payment-buttons button.active {
+  background-color: #2196f3;
+  color: white;
+  border-color: #2196f3;
+}

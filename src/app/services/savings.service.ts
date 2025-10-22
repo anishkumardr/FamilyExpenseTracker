@@ -31,6 +31,7 @@ export class SavingService {
       this.supabase
         .from('current_month_saving_remaining')
         .select('allotted_amount, saved_amount, remaining_amount')
+        .eq('family_id', this.authService.familyId)
         .single()
     ).pipe(map((res:any) => res.data || {remaining_amount:0, allotted_amount:0}));
   }

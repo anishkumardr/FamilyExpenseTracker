@@ -7,6 +7,7 @@ import { Expense } from '../../models/expense.model';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDialogComponent } from './expense-popup/confirm-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FrequencyService } from '../../services/frequency.service';
 
 @Component({
   selector: 'app-expense-management',
@@ -27,22 +28,33 @@ export class ExpenseManagementComponent {
   showPopup = false;
   editingExpense: Expense | null = null;
   currentMonth = new Date().getMonth() + 1;
+   paymentMethods = ['upi', 'credit', 'cash'];
+  frequentCategories: any[] = [];
    private realtimeSubscription: any;
-  constructor(private expenseService: ExpenseService, private snackBar: MatSnackBar) {}
+  constructor(private expenseService: ExpenseService,private frequencyService: FrequencyService, private snackBar: MatSnackBar) {}
 
   ngOnInit() {
     this.loadExpenses();
     this.loadRemainingAmount();
+    this.loadFrequentData();
     this.expenseService.getCategories().subscribe(cats => {
       console.log('Fetched categories:', cats);
       this.categories = cats;
+      
     });
     // Subscribe via service
     this.realtimeSubscription = this.expenseService.subscribeToExpenses(payload => {
       console.log('Realtime event:', payload);
       this.loadExpenses();
       this.loadRemainingAmount();
+      this.loadFrequentData();
     });
+    
+  }
+
+  async loadFrequentData() {
+    this.frequentCategories = await this.frequencyService.getFrequentCategories(3);
+    console.log('Frequent categories loaded:', this.frequentCategories);
   }
 
   loadExpenses() {

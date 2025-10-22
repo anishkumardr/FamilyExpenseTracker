@@ -26,6 +26,7 @@ export class IncomeService {
    const { data, error } = await this.supabase
   .from('income')
   .select('*, user:user_id(id, full_name, username), income_type(*)')
+  .eq('family_id', this.authService.familyId)
   .order('created_at', { ascending: false });
 
 console.log('Fetched incomes:', data, error);

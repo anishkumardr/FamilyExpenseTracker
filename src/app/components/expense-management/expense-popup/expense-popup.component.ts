@@ -7,6 +7,7 @@ import { ExpenseParserService } from '../../../services/expense-parser.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { firstValueFrom } from 'rxjs';
+import { Category } from '../../../models/category.model';
 
 @Component({
   selector: 'app-expense-popup',
@@ -19,6 +20,9 @@ export class ExpensePopupComponent {
   @Input() expense: any = null; // null = add new, else edit
   @Output() close = new EventEmitter<boolean>();
   @Input() categories: { id: string, category_name: string }[] = [];
+  @Input() frequentCategories: { id: string,category_id:string, categories: Category }[] = [];
+  showCategoryDropdown = false;
+  paymentMethods = ['upi', 'credit', 'cash'];
    successMessage = '';
   // toggle easy/manual
   entryMode: 'easy' | 'manual' = 'easy';
@@ -62,6 +66,13 @@ ngOnChanges(changes:SimpleChanges) {
 
   switchMode(mode: 'easy' | 'manual') {
     this.entryMode = mode;
+  }
+  selectCategory(cat: any) {
+    console.log('Category selected:', cat);
+    this.model.category_id = cat.category_id;
+  }
+  showCategoryDropdownMethod() {
+    this.showCategoryDropdown = !this.showCategoryDropdown;
   }
 // submitEasyEntry() {
 //     // Call your parser service here
