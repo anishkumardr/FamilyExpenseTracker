@@ -31,6 +31,24 @@ export class CategoryService {
     if (error) throw error;
     return data as Category[];
   }
+ async getSingleCategory(category_name: string): Promise<Category> {
+  if (!this.authService.familyId) {
+    console.log('No family_id found in profile:', this.authService.profile);
+    throw new Error('No family_id found');
+  }
+
+  const { data, error } = await this.supabase
+    .from('categories')
+    .select('*')
+    .eq('family_id', this.authService.familyId)
+    .eq('category_name', category_name)
+    .single(); // ✅ only one select() needed
+
+  console.log('Fetched single category:', data, 'Error:', error);
+
+  if (error) throw error;
+  return data as Category;
+}
 
   // ✅ Add new category
   async addCategory(category: Omit<Category, 'id' | 'family_id' | 'created_at'>): Promise<Category> {

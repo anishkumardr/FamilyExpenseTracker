@@ -45,6 +45,7 @@ categoryFilter: string = '';
   categories: Category[] = [];
   loading = false;
   editId: string | null = null;
+  allotmentIdToEdit: string | null = null;
   tempAmount: number = 0;
   tempAmounts: { [key: string]: number } = {};
   // popup state
@@ -141,8 +142,10 @@ console.log('current month'+this.currentMonth + 'current year'+this.currentYear 
    startEdit(allotment: Allotment) {
     console.log('Editing allotment:', allotment);
     this.editId = allotment.category_id;
+    this.allotmentIdToEdit = allotment.id;
     this.tempAmount = Number(allotment.amountAllotted) || 0;
     this.tempAmounts[allotment.category_id] = Number(allotment.amountAllotted) || 0;
+    console.log('tempAmount set to:', this.tempAmount);
     // this.addForm.setValue({
     //   category_id: allotment.category_id,
     //   amountAllotted: allotment.amountAllotted,
@@ -164,9 +167,9 @@ console.log('current month'+this.currentMonth + 'current year'+this.currentYear 
     return Object.values(this.popupAllotments).reduce((s, v) => s + (Number(v) || 0), 0);
   }
    get remainingIncome(): number {
-    if (this.editId) {
+    if (this.allotmentIdToEdit) {
       const sumExclEdited = this.allotments
-        .filter(a => a.id !== this.editId)
+        .filter(a => a.id !== this.allotmentIdToEdit)
         .reduce((s, a) => s + (Number(a.amountAllotted) || 0), 0);
       return this.availableIncome - (sumExclEdited + (Number(this.tempAmount) || 0));
     } else if (this.showAddPopup) {
@@ -178,19 +181,24 @@ console.log('current month'+this.currentMonth + 'current year'+this.currentYear 
   
  onEditAmountChange(value: number, allotment: Allotment ) {
     this.tempAmounts[allotment.category_id] = value;
+    console.log('Amount changed for', allotment.category, 'to', value);
   }
 
   async saveEdit(val: Allotment) {
+    
     console.log('Save edit called with:',this.addForm, val,this.editId,this.tempAmount);
     if (!this.editId) return;
 console.log('Saving edit for allotment:', this.editId, val);
     try {
 
+console.log('Remaining income before save:', this.remainingIncome);
         if (this.remainingIncome < 0) {
         this.errorMessage = `Allotments exceed available income (Remaining: ₹${this.remainingIncome})`;
         return;
         }
-      if(val.id===''){
+        console.log('val id'+val.id);
+      if(val.id ===''){
+        console.log('Adding new allotment as id is empty');
         // new allotment added via edit row
         const addedAmount = this.tempAmounts[val.category_id]??val.amountAllotted;
         console.log('Saving added amount for', val.category, '=>', addedAmount);
@@ -212,6 +220,7 @@ console.log('Saving edit for allotment:', this.editId, val);
       }
       else
       {
+        console.log('Updating existing allotment');
         const updatedAmount = this.tempAmounts[val.category_id];
         console.log('Saving updated amount for', val.category, '=>', updatedAmount);
         val.amountAllotted = updatedAmount;

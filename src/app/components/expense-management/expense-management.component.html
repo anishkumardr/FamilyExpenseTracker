@@ -41,13 +41,14 @@
           <div class="expense-desc">
             <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'cash'">account_balance</span>
           <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'upi'">payments</span>
+          <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'cc'">credit_card</span>
           <span class="material-icons icon-inline" *ngIf="expense.payment_method == 'credit'">credit_card</span>
           | {{ expense.description }} 
           <span *ngIf="group.isCurrentMonth">
             <span>|</span> <button class="icon-btn"  (click)="editExpense(expense)">
             <span class="material-icons">edit</span>
           </button>
-          <span>|</span> <button class="icon-btn"  (click)="onDeleteExpense(expense.id!)">
+          <span>|</span> <button class="icon-btn"  (click)="onDeleteExpense(expense)">
             <span class="material-icons">delete</span>
           </button>
           </span> 

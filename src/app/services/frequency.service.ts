@@ -21,9 +21,21 @@ export class FrequencyService {
       .eq('family_id', this.authService.familyId)
       .order('usage_count', { ascending: false })
       .limit(limit);
-
+console.log('Frequent categories fetched:', data, 'Error:', error);
     if (error) throw error;
-    return data;
+    // ✅ Deduplicate by category_id
+  const uniqueCategories = [];
+  const seen = new Set();
+
+  for (const item of data) {
+    if (!seen.has(item.category_id)) {
+      seen.add(item.category_id);
+      uniqueCategories.push(item);
+    }
+  }
+
+  // limit after deduplication
+  return uniqueCategories.slice(0, limit);
   }
 
   async getFrequentPaymentMethods(limit = 5) {

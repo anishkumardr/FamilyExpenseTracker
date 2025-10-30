@@ -5,6 +5,7 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Expense } from '../models/expense.model';
 import { environment } from '../../environments/environments';
 import { AuthService } from './auth.service';
+import { CategoryService } from './category.service';
 
 
 
@@ -20,7 +21,7 @@ export interface ExpenseGroup {
 export class ExpenseService {
 
  public supabase: SupabaseClient;
-   constructor(private authService: AuthService) {
+   constructor(private authService: AuthService,private categoryService:CategoryService) {
      this.supabase = createClient(
       environment.supabaseUrl, environment.supabaseKey
      );
@@ -131,7 +132,7 @@ private subscription: any;
   }
 
   // Add a new expense
-  addExpense(expense: Expense): Observable<Expense> {
+  async addExpense(expense: Expense): Promise<Expense> {
       if (!this.authService.familyId) {
       throw new Error('No family_id found');
     }
@@ -139,7 +140,7 @@ private subscription: any;
       throw new Error('No user_id found');
     }
     console.log('Adding expense:', { ...expense, user_id: this.authService.userId});
-    const insertPromise = this.supabase
+    const { data, error }  = await this.supabase
     .from('expense_management')
     .insert([
       { 
@@ -150,57 +151,202 @@ private subscription: any;
     ])
     .select();
 
-   return from(insertPromise).pipe(
-    map((res: any) => {
-      if (res.error) {
-        console.error('Error inserting expense:', res.error);
-        throw res.error;
+      if (expense.payment_method?.toLowerCase() === 'cc') {
+        this.categoryService.getSingleCategory('Credit Card').then(async (creditCardCategory) => {
+          if (creditCardCategory) {
+            console.log('Updating credit card allotment for added expense with category:', creditCardCategory);
+            await this.updateAllotmentForCategory(this.authService.familyId, creditCardCategory.id, +expense.amount,'Credit Card' ,
+              new Date(expense.occurred_at || new Date()).getMonth() + 1,
+              new Date(expense.occurred_at || new Date()).getFullYear());
+          }
+        }).catch(err => {
+          console.error('Error fetching Credit Card category:', err);
+        });
       }
-      return res.data[0]; // first inserted record
-    })
-  );
+
+      if (expense.payment_method?.toLowerCase() === 'credit') {
+        this.categoryService.getSingleCategory('Credit').then(async (creditCategory) => {
+          if (creditCategory) {
+            console.log('Updating credit allotment for added expense with category:', creditCategory);
+            await this.updateAllotmentForCategory(this.authService.familyId, creditCategory.id, +expense.amount,'Credit' ,
+              new Date(expense.occurred_at || new Date()).getMonth() + 1,
+              new Date(expense.occurred_at || new Date()).getFullYear());
+          }
+        }).catch(err => {
+          console.error('Error fetching Credit Card category:', err);
+        });
+      }
+
+   return data?.[0] as Expense;
   }
 
   // Update existing expense
-  updateExpense(expense: Expense): Observable<Expense> {
+ async updateExpense(expense: Expense): Promise<Expense> {
   if (!expense.id) throw new Error('Expense ID required for update');
   console.log('Updating expense:', expense);
 
-  return from(
-    this.supabase
-      .from('expense_management')
-      .update(expense)
-      .eq('id', expense.id)
-      .select()
-  ).pipe(
-    map((res: any) => {
-      if (res.error) {
-        console.error('Update failed:', res.error);
-        throw res.error;
-      }
-      return res.data?.[0] || null;
+  // Fetch existing expense
+  const { data: existing, error: fetchErr } = await this.supabase
+    .from('expense_management')
+    .select('*')
+    .eq('id', expense.id)
+    .maybeSingle();
+
+  if (fetchErr) {
+    console.error('Error fetching existing expense', fetchErr);
+    throw fetchErr;
+  }
+
+  if (!existing) {
+    throw new Error('Existing expense not found');
+  }
+
+  // Perform update
+  const { data, error: updateErr } = await this.supabase
+    .from('expense_management')
+    .update({
+      category_id: expense.category_id,
+      amount: expense.amount,
+      payment_method: expense.payment_method,
+      description: expense.description,
+      // add other fields if needed
     })
-  );
+    .eq('id', expense.id)
+    .select()
+    .single();
+
+  if (updateErr) {
+    console.error('Error updating expense', updateErr);
+    throw updateErr;
+  }
+console.log('Expense updated:', data);
+  // Adjust allotment logic
+  const oldMode = existing.payment_method?.toLowerCase();
+  const newMode = expense.payment_method?.toLowerCase();
+
+  const oldAmount = existing.amount;
+  const newAmount = expense.amount;
+console.log('Old payment method:', oldMode, 'New payment method:', newMode);
+  try {
+    if(oldMode === 'cc'  || newMode === 'cc') {
+    
+    const creditCardCategory = await this.categoryService.getSingleCategory('Credit Card');
+    console.log('Fetched Credit Card category for allotment adjustment:', creditCardCategory);
+    if (creditCardCategory) {
+      console.log('Payment method changed from', oldMode, 'to', newMode);
+      // Credit → Non-credit
+      if (oldMode === 'cc' && newMode !== 'cc') {
+        console.log('Adjusting allotment for cc → non-cc change');
+
+        await this.updateAllotmentForCategory(
+          existing.family_id,
+          creditCardCategory.id,
+          -existing.amount,
+          'Credit Card',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+
+      // Non-credit → Credit
+      if (oldMode !== 'cc' && newMode === 'cc') {
+        await this.updateAllotmentForCategory(
+          this.authService.familyId,
+          creditCardCategory.id,
+          expense.amount,
+          'Credit Card',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+      if (oldMode === 'cc' && newMode === 'cc') {
+        console.log('Adjusting allotment for cc → cc amount change');
+        let updatedamount = newAmount - oldAmount;
+        await this.updateAllotmentForCategory(
+          this.authService.familyId,
+          creditCardCategory.id,
+          updatedamount,
+          'Credit Card',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+    }
+    }
+    if(oldMode === 'credit' || newMode === 'credit') {
+    
+    const creditCategory = await this.categoryService.getSingleCategory('Credit');
+console.log('Fetched Credit category for allotment adjustment:', creditCategory);
+    if (creditCategory) {
+      console.log('Payment method changed from', oldMode, 'to', newMode);
+      // Credit → Non-credit
+      if (oldMode === 'credit' && newMode !== 'credit') {
+        console.log('Adjusting allotment for credit → non-credit change');
+
+        await this.updateAllotmentForCategory(
+          existing.family_id,
+          creditCategory.id,
+          -existing.amount,
+          'Credit',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+
+      // Non-credit → Credit
+      if (oldMode !== 'credit' && newMode === 'credit') {
+        await this.updateAllotmentForCategory(
+          this.authService.familyId,
+          creditCategory.id,
+          expense.amount,
+          'Credit',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+      if (oldMode === 'credit' && newMode === 'credit') {
+        console.log('Adjusting allotment for credit → credit amount change');
+        let updatedamount = newAmount - oldAmount;
+        await this.updateAllotmentForCategory(
+          this.authService.familyId,
+          creditCategory.id,
+          updatedamount,
+          'Credit',
+          new Date(expense.occurred_at).getMonth() + 1,
+          new Date(expense.occurred_at).getFullYear()
+        );
+      }
+    }
+  }
+  } catch (err) {
+    console.error('Error fetching Credit Card category:', err);
+  }
+
+  return data as Expense;
 }
-  getCategories(): Observable<{ id: string, category_name: string }[]> {
+getCategories(): Observable<{ id: string; category_name: string; category_type: string }[]> {
   if (!this.authService.familyId) {
     throw new Error('No family_id found');
   }
 
+  // Supabase call always returns a Promise<{ data, error }>
   const promise = this.supabase
     .from('categories')
-    .select('id, category_name')
+    .select('id, category_name, category_type')
     .eq('family_id', this.authService.familyId)
     .eq('category_type', 'expense')
     .eq('status', true);
 
+  // Convert promise to observable properly
   return from(promise).pipe(
-    map((res: any) => {
+    map((res) => {
       if (res.error) {
         console.error('Supabase error fetching categories:', res.error);
         return [];
       }
-      return res.data || [];
+
+      // res.data can be null or an array, so handle safely
+      return (res.data ?? []) as { id: string; category_name: string; category_type: string }[];
     })
   );
 }
@@ -248,13 +394,99 @@ private subscription: any;
       }
     }
 
-    deleteExpense(expenseId: string): Observable<any> {
-      console.log('Deleting expense with ID:', expenseId);
-    return from(
-      this.supabase
-        .from('expenses')
-        .delete()
-        .eq('id', expenseId)
-    ).pipe(map(res => res.data));
+    async deleteExpense(expense: Expense): Promise<any> {
+      const { error } = await this.supabase.from('expense_management').delete().eq('id', expense.id);
+      if (error) throw error;
+console.log('Deleted expense:', expense.id,expense.payment_method);
+
+      if (expense.payment_method?.toLowerCase() === 'credit') {
+        console.log('Updating credit card allotment for deleted expense');
+         this.categoryService.getSingleCategory('Credit').then(async (creditCardCategory) => {
+          if (creditCardCategory) {
+            console.log('Updating credit card allotment for deleted expense with category:', creditCardCategory);
+            await this.updateAllotmentForCategory(this.authService.familyId, creditCardCategory.id, -expense.amount,'Credit' ,
+              new Date(expense.occurred_at || new Date()).getMonth() + 1,
+              new Date(expense.occurred_at || new Date()).getFullYear());
+          }
+        }).catch(err => {
+          console.error('Error fetching Credit Card category:', err);
+        }
+        );
+      }
+
+      if (expense.payment_method?.toLowerCase() === 'cc') {
+        console.log('Updating credit card allotment for deleted expense');
+         this.categoryService.getSingleCategory('Credit Card').then(async (creditCardCategory) => {
+          if (creditCardCategory) {
+            console.log('Updating credit card allotment for deleted expense with category:', creditCardCategory);
+            await this.updateAllotmentForCategory(this.authService.familyId, creditCardCategory.id, -expense.amount,'credit Card',
+              new Date(expense.occurred_at || new Date()).getMonth() + 1,
+              new Date(expense.occurred_at || new Date()).getFullYear());
+          }
+        }).catch(err => {
+          console.error('Error fetching Credit Card category:', err);
+        }
+        );
+      }
   }
+
+  // utils inside expense.service.ts
+
+/** Computes next month and year from given month/year (1-12 months) */
+private nextMonthYear(month: number, year: number): { month: number; year: number } {
+  if (month === 12) return { month: 1, year: year + 1 };
+  return { month: month + 1, year };
+}
+
+private async updateAllotmentForCategory(
+  familyId: string,
+  creditcardCategoryId : string,
+  amountChange: number,
+  searchCategoryName: string,
+  month: number,
+  year: number
+): Promise<void> {
+  const { month: nextMonth, year: nextYear } = this.nextMonthYear(month, year);
+console.log(`Updating ${searchCategoryName} allotment for family ${familyId} for ${nextMonth}/${nextYear} by amount: ${amountChange}`);
+  // Fetch existing allotment
+  const { data: existing, error: fetchError } = await this.supabase
+    .from('allotments')
+    .select(`*,categories!inner (
+      id,
+      category_name,
+      category_type
+    )`)
+    .eq('family_id', familyId)
+    .eq('categories.category_type', 'expense')
+    .ilike('categories.category_name', searchCategoryName)
+    .eq('month', nextMonth)
+    .eq('year', nextYear)
+    .maybeSingle();
+console.log('Existing allotment fetch result:', existing, 'Error:', fetchError);
+  if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+console.log('Existing allotment fetched for update:', existing);
+  if (existing) {
+    const newAmount = existing.amount_allotted + amountChange;
+console.log('Calculated new allotment amount:', newAmount);
+    if (newAmount <= 0) {
+      // Remove if fully adjusted
+      await this.supabase.from('allotments').delete().eq('id', existing.id);
+    } else {
+      // Update with new amount
+      const {data: updated, error: fetchError} = await this.supabase.from('allotments').update({ amount_allotted: newAmount }).eq('id', existing.id);
+      if (fetchError) throw fetchError;
+      console.log('Allotment updated:', updated);
+    }
+  } else if (amountChange > 0) {
+    // Create new allotment only for positive values
+    await this.supabase.from('allotments').insert({
+      family_id: this.authService.familyId,
+        category_id: creditcardCategoryId,
+        month: nextMonth,
+        year: nextYear,
+        amount_allotted: amountChange
+    });
+  }
+}
+
 }

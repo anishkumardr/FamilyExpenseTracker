@@ -22,7 +22,7 @@ export class ExpensePopupComponent {
   @Input() categories: { id: string, category_name: string }[] = [];
   @Input() frequentCategories: { id: string,category_id:string, categories: Category }[] = [];
   showCategoryDropdown = false;
-  paymentMethods = ['upi', 'credit', 'cash'];
+  paymentMethods = ['upi', 'credit', 'cash','cc'];
    successMessage = '';
   // toggle easy/manual
   entryMode: 'easy' | 'manual' = 'easy';
@@ -79,7 +79,7 @@ ngOnChanges(changes:SimpleChanges) {
 //     alert('Easy Entry submitted (parser integration)');
 //     this.closePopup(true);
 //   }
-  submitManualEntry() {
+  async submitManualEntry() {
     console.log('Manual entry model:', this.model);
     if (!this.model.amount || !this.model.category_id || !this.model.payment_method || !this.model.description) {
     alert('Please fill all required fields.');
@@ -88,13 +88,14 @@ ngOnChanges(changes:SimpleChanges) {
     console.log('Submitting manual entry:', this.model);
     if (this.expense) {
       // Update
-      this.expenseService.updateExpense({ ...this.model, id: this.expense.id } as Expense)
-        .subscribe(() => this.closePopup(true));
+      await this.expenseService.updateExpense({ ...this.model, id: this.expense.id } as Expense);
+       this.closePopup(true);
     } else {
       // Add new
       console.log('Adding expense:', this.model);
-      this.expenseService.addExpense(this.model as Expense)
-        .subscribe(() => this.closePopup(true));
+      this.expenseService.addExpense(this.model as Expense);
+         this.closePopup(true);
+
     }
   }
 
@@ -139,7 +140,7 @@ this.closePopup(true);
           payment_method: parsed.payment_method ?? 'cash',
           category_id: parsed.category_id ?? '',
         };
-        await this.expenseService.addExpense(expenseDb as Expense).toPromise();
+        await this.expenseService.addExpense(expenseDb as Expense);
         this.successMessage = 'Expense saved successfully!';
         // Optionally refresh the list
         this.closePopup(true)
