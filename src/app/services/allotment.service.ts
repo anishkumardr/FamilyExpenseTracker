@@ -4,6 +4,8 @@ import { environment } from '../../environments/environments';
 import { AuthService } from './auth.service';
 import { Allotment } from '../models/allotment.model';
 import { Category } from '../models/category.model';
+import { Observable, of } from 'rxjs';
+import { Expense } from '../models/expense.model';
 
 @Injectable({
   providedIn: 'root'
@@ -228,5 +230,40 @@ console.log('Adding allotment:', allotment);
     })) as Category[];
   }
 
-  
+  async getExpensesByCategory(categoryId: string,month: number,year: number): Promise<Expense[]> {
+  if (!this.authService.familyId) {
+    throw new Error('No family_id found');
+  }
+
+const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 0); // 0th day of next month = last day of current month
+console.log('Start date:', start, 'End date:', end);
+  const startDate = start.toISOString().split('T')[0]; // format YYYY-MM-DD
+  const endDate = end.toISOString().split('T')[0];
+
+
+  console.log('Fetching expenses for category:', categoryId, 'from', startDate, 'to', endDate);
+  const { data, error } = await this.supabase
+    .from('expense_management')
+    .select('id, occurred_at, amount, payment_method, description, category_id')
+    .eq('family_id', this.authService.familyId)
+    .eq('category_id', categoryId)
+    .gte('occurred_at', startDate)
+    .lte('occurred_at', endDate)
+    .order('occurred_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching expenses by category:', error);
+    throw error;
+  }
+
+  // Map and format fields to match your front-end requirement
+  return data as Expense[];
+  // return (data as Expense[]).map(item => ({
+  //   date: item.occurred_at ? item.occurred_at.substring(0, 10) : '',
+  //   amount: item.amount,
+  //   paymentType: item.payment_method,
+  //   description: item.description
+  // }));
+}
 }

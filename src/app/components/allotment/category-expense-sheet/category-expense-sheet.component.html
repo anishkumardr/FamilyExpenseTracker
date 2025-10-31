@@ -1,0 +1,40 @@
+<div class="sheet-container">
+  <div class="sheet-header">
+    <div class="header-title">{{ data.categoryName }} - {{ selectedDate  | date:'MMM yyyy' }}</div>
+    <button class="close-btn" (click)="closeSheet()">✕</button>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-item">
+      <span>Total Allotted</span>
+      <strong>{{ totalAllotted | currency:'INR' }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Total Spent</span>
+      <strong>{{ totalSpent | currency:'INR' }}</strong>
+    </div>
+    <div class="summary-item">
+      <span>Remaining</span>
+      <strong [ngClass]="{ 'positive': remaining >= 0, 'negative': remaining < 0 }">
+        {{ remaining | currency:'INR' }}
+      </strong>
+    </div>
+  </div>
+
+  <div class="expense-list">
+    <div *ngFor="let expense of expenses" class="expense-card">
+      <div class="left">
+        <div class="date">{{ expense.occurred_at | date:'dd MMM' }}</div>
+        <div class="desc">{{ expense.description }}</div>
+      </div>
+      <div class="right">
+        <div class="amount">{{ expense.amount | currency:'INR' }}</div>
+        <div class="payment-type">{{ expense.payment_method }}</div>
+      </div>
+    </div>
+
+    <div *ngIf="expenses.length === 0" class="no-data">
+      No expenses found for this category.
+    </div>
+  </div>
+</div>

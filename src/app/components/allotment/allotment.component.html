@@ -37,7 +37,7 @@
       
       <!-- View mode -->
       <div *ngIf="editId !== a.category_id" class="row">
-        <div class="col category">
+        <div class="col category" (click)="openCategoryExpenseSheet(a)">
             <span *ngIf="a.category_type=='expense'" class="material-icons icon-inline">receipt_long</span> 
             <span *ngIf="a.category_type=='savings'" class="material-icons icon-inline">savings</span> 
             {{ a.category }}</div>

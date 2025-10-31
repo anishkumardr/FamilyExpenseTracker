@@ -22,3 +22,9 @@ a.active {
 a.active .material-icons {
   color: white !important;
 }
+.mat-bottom-sheet-container {
+  background: transparent !important;
+  color: #fff !important;          // text color
+  box-shadow: none !important;     // removes white glow/shadow
+  border: none !important;         // ensures no border
+}

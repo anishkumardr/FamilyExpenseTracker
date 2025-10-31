@@ -14,6 +14,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { MatDividerModule } from '@angular/material/divider';
 import { CategoryAddPopupComponent } from '../category-management/category-add-popup/category-add-popup.component';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { CategoryExpenseSheetComponent } from './category-expense-sheet/category-expense-sheet.component';
 
 interface AllotmentRow {
   id: string;
@@ -29,7 +31,7 @@ interface AllotmentRow {
   imports: [FormsModule, CommonModule, MatIconModule,MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
-    MatButtonModule,NgxMatSelectSearchModule,MatDividerModule,CategoryAddPopupComponent],
+    MatButtonModule,NgxMatSelectSearchModule,MatDividerModule,CategoryAddPopupComponent,CategoryExpenseSheetComponent],
   templateUrl: './allotment.component.html',
   styleUrls: ['./allotment.component.scss']
 })
@@ -63,6 +65,7 @@ newCategorySearch = '';
 filteredCategories: Category[] = [];
 selectedCategoryId: string | null = null;
 
+
   addForm = new FormGroup({
     category_id: new FormControl<string | null>(null, Validators.required),
     amountAllotted: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
@@ -70,7 +73,7 @@ selectedCategoryId: string | null = null;
     year: new FormControl<number | null>(null, Validators.required)
   });
   
- constructor(private allotmentService: AllotmentService, private incomeService : IncomeService,private authService: AuthService) {}
+ constructor(private allotmentService: AllotmentService, private incomeService : IncomeService,private authService: AuthService,private _bottomSheet: MatBottomSheet) {}
 
   ngOnInit() {
      this.loadCategories();
@@ -406,4 +409,20 @@ async addSelectedCategory() {
    
     this.selectedCategoryId = newCategory?.id || null;
   }
+
+openCategoryExpenseSheet(allotment: Allotment): void {
+  console.log('Opening expense sheet for allotment:', allotment);
+  this._bottomSheet.open(CategoryExpenseSheetComponent, {
+    data: {
+      categoryId: allotment.category_id,
+      categoryName: allotment.category,
+      month: allotment.month,
+      year: allotment.year, 
+      amountAllotted: allotment.amountAllotted,
+      amountSpent: allotment.amountSpent
+    },
+    hasBackdrop: true,
+    panelClass: 'dark-bottom-sheet'
+  });
+}
 }
