@@ -1,0 +1,15 @@
+<div class="card">
+  <h3>Credit Card Summary</h3>
+
+  <div class="total-credit">
+    Total Credit Used: ₹ {{ data?.totalCreditUsed }}
+  </div>
+
+  <h4>Upcoming Bills</h4>
+
+  <div class="bill" *ngFor="let b of data?.upcomingBills">
+    <div>{{ b.cardName }}</div>
+    <div>₹ {{ b.dueAmount }}</div>
+    <div class="due">Due: {{ b.dueDate }}</div>
+  </div>
+</div>

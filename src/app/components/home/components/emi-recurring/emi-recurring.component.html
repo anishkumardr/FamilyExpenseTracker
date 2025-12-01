@@ -1,0 +1,9 @@
+<div class="card">
+  <h3>Recurring / EMI Payments</h3>
+
+  <div class="emi" *ngFor="let e of data">
+    <div class="name">{{ e.name }}</div>
+    <div class="amount">₹ {{ e.amount }}</div>
+    <div class="due">Due: {{ e.due_date }}</div>
+  </div>
+</div>

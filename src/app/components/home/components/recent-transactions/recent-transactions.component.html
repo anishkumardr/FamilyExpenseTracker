@@ -1,0 +1,17 @@
+<div class="card">
+  <h3>Recent Expenses</h3>
+
+  <div class="txn" *ngFor="let t of data">
+    <div class="left">
+      <div class="amount">₹ {{ t.amount }}</div>
+      <div class="category">{{ t.category_name }}</div>
+    </div>
+    <div class="right">
+      <div *ngIf="t.payment_method == 'cash'" >Cash</div>
+      <div *ngIf="t.payment_method == 'upi'" >UPI</div>
+      <div *ngIf="t.payment_method == 'cc'" >Credit Card</div>
+      <div *ngIf="t.payment_method == 'credit'" >Credit</div>
+      <div class="date">{{ t.occurred_at | date:'MMM d, y'}}</div>
+    </div>
+  </div>
+</div>

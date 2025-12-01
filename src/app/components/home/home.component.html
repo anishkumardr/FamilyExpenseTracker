@@ -1,1 +1,28 @@
-<div>Will be coming in phase 3.</div>
+<div class="dashboard-container">
+
+  <app-summary-bar 
+    [data]="dashboard()?.summary">
+  </app-summary-bar>
+
+  <app-category-chart
+    [data]="dashboard()?.categoryWise">
+  </app-category-chart>
+
+  <app-budget-vs-spend
+    [data]="dashboard()?.budget">
+  </app-budget-vs-spend>
+
+  <app-credit-summary
+    [data]="dashboard()?.credit">
+  </app-credit-summary>
+
+  <app-recent-transactions
+    [data]="dashboard()?.recentTxns">
+  </app-recent-transactions>
+
+  <app-emi-recurring
+    [data]="dashboard()?.emi">
+  </app-emi-recurring>
+
+</div>
+<div *ngIf="loading()">Loading...</div>

@@ -1,0 +1,42 @@
+<div class="summary-row">
+  
+  <!-- Income Card -->
+  <div class="summary-card">
+    <div class="label">Income</div>
+    <div class="amount">₹{{ data?.totalIncome || 0 }}</div>
+
+    <div class="bars">
+      <div class="bar top" [style.width.%]="getPercent(data?.totalIncome, data?.totalIncome)"></div>
+      <div class="bar bottom"></div>
+    </div>
+  </div>
+
+  <!-- Expense Card -->
+  <div class="summary-card">
+    <div class="label">Expense</div>
+    <div class="amount">₹{{ data?.totalExpense || 0 }}</div>
+
+    <div class="bars">
+      <div class="bar top" 
+           [style.width.%]="getPercent(data?.totalExpense, data?.totalIncome)">
+      </div>
+      <div class="bar bottom"></div>
+    </div>
+  </div>
+
+  <!-- Balance Card -->
+  <div class="summary-card">
+    <div class="label">Savings</div>
+    <div class="amount green">
+      ₹{{ data?.balance || 0 }}
+    </div>
+
+    <div class="bars">
+      <div class="bar top" 
+           [style.width.%]="50">
+      </div>
+      <div class="bar bottom" ></div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,23 @@
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+
+  .txn {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+
+    .amount {
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .date {
+      opacity: 0.5;
+      font-size: 12px;
+    }
+  }
+}

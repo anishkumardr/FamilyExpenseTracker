@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HomeComponent } from './home.component';
+import { EmiRecurringComponent } from './emi-recurring.component';
 
-describe('HomeComponent', () => {
-  let component: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('EmiRecurringComponent', () => {
+  let component: EmiRecurringComponent;
+  let fixture: ComponentFixture<EmiRecurringComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HomeComponent]
+      imports: [EmiRecurringComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(EmiRecurringComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

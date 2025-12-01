@@ -1,0 +1,9 @@
+<div class="card">
+  <h3>Category Wise Spending</h3>
+  <div class="placeholder">[ Chart Will Appear Here ]</div>
+
+  <div class="list" *ngFor="let item of data">
+    <div class="label">{{ item.category }}</div>
+    <div class="value">{{ item.amount }}</div>
+  </div>
+</div>

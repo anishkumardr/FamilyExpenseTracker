@@ -10,16 +10,16 @@ export class AuthService {
   private supabase: SupabaseClient;
   session: Session | null = null;
    private _profile: any;
-
+  userName: string | null = null;
   constructor(private router: Router) {
     this.supabase = createClient(
       'https://dtjrthjmwkhxrjlydjkt.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR0anJ0aGptd2toeHJqbHlkamt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc3NjUwODksImV4cCI6MjA3MzM0MTA4OX0.cSv3rwNGE8LDtYQUZF6VIMFscTgAgGipk9C-DrA7rD0'
     );
   this.loadProfileFromStorage();
-    
   }
   get profile() {
+    console.log('Accessing profile:', this._profile);
     return this._profile;
   }
   get userId() {
@@ -32,6 +32,16 @@ export class AuthService {
 
   get isAdmin() {
     return this._profile?.is_admin === true;
+  }
+  
+
+  getUserName(): string {
+    if(this.profile == null) {
+      console.log('Profile is null, returning default user name.');
+      return 'User';
+    }
+      console.log('Retrieving user name from profile:', this.profile);
+    return this.profile.full_name ?? 'User';
   }
   async login(username: string, password: string) {
 

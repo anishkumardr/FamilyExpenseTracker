@@ -1,26 +1,50 @@
+import { Component, signal, inject } from '@angular/core';
+import { DashboardService } from './dashboard.service';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { SummaryBarComponent } from './components/summary-bar/summary-bar.component';
+import { CategoryChartComponent } from './components/category-chart/category-chart.component';
+import { BudgetVsSpendComponent } from './components/budget-vs-spend/budget-vs-spend.component';
+import { CreditSummaryComponent } from './components/credit-summary/credit-summary.component';
+import { RecentTransactionsComponent } from './components/recent-transactions/recent-transactions.component';
+import { EmiRecurringComponent } from './components/emi-recurring/emi-recurring.component';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule],
+  standalone: true,
+  imports: [
+    CommonModule,
+    SummaryBarComponent,
+    CategoryChartComponent,
+    BudgetVsSpendComponent,
+    CreditSummaryComponent,
+    RecentTransactionsComponent,
+    EmiRecurringComponent
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent {
-legend = [
-    {label:'Personal care', color:'#ff5a5f'},
-    {label:'Groceries', color:'#00b894'},
-    {label:'Clothing', color:'#0984e3'},
-    {label:'Eating out', color:'#fdcb6e'}
-  ];
 
-  topExpenses = [
-    {date: '16 Sep', category:'Groceries', amount: 1200, desc: 'Weekly groceries'},
-    {date: '15 Sep', category:'Transport', amount: 450, desc: 'Cab to airport'},
-    {date: '13 Sep', category:'Coffee', amount: 200, desc: 'Cafe'}
-  ];
+  dashboard = signal<any>(null);
+  dashboardService = inject(DashboardService);
+
+  ngOnInit() {
+    // default month-year
+    const now = new Date();
+    this.loadDashboard(now.getMonth() + 1, now.getFullYear());
+  }
+
+  loading = signal(false);
+
+async loadDashboard(month: number, year: number) {
+  this.loading.set(true);
+  try {
+  this.dashboard.set(await this.dashboardService.getDashboard(month, year));
+  console.log('Dashboard data loaded:', this.dashboard() );
+} catch (err) {
+  console.error(err);
+  alert("Failed to load dashboard!");
+}
+  this.loading.set(false);
+}
 }

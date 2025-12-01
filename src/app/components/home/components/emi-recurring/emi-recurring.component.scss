@@ -1,0 +1,18 @@
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+
+  .emi {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+
+    .name {
+      font-size: 16px;
+    }
+
+    .due {
+      opacity: 0.6;
+    }
+  }
+}

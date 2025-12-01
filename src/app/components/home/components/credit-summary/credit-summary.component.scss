@@ -1,0 +1,20 @@
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+
+  .total-credit {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .bill {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+
+    .due {
+      opacity: 0.6;
+    }
+  }
+}

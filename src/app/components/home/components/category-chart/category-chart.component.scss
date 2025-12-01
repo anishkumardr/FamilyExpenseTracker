@@ -1,0 +1,19 @@
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+
+  .placeholder {
+    padding: 40px 0;
+    text-align: center;
+    opacity: 0.3;
+  }
+
+  .list {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+}

@@ -5,6 +5,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { BottomNavComponent } from "./components/bottom-nav/bottom-nav.component";
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +16,12 @@ import { BottomNavComponent } from "./components/bottom-nav/bottom-nav.component
 })
 export class AppComponent implements OnInit {
   users: any;
-
-  constructor(private supabase: SupabaseService,private router: Router) {}
+  userName = '';
+  constructor(private supabase: SupabaseService,private router: Router,private auth: AuthService) {
+    console.log('AppComponent constructor called.'); 
+    this.userName = this.auth.getUserName();
+     console.log('AppComponent initialized. UserName:', this.userName);
+  }
 showNav = true;
 lightTheme = false;
   toggleTheme(){ this.lightTheme = !this.lightTheme; }

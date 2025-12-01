@@ -2,9 +2,12 @@
       <div class="topbar">
         <div class="brand">Family Expense</div>
         <div class="right-actions">
-          <button mat-icon-button aria-label="toggle theme" (click)="toggleTheme()">
+          <button style="display: none;" mat-icon-button aria-label="toggle theme" (click)="toggleTheme()">
             <mat-icon>{{ lightTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
           </button>
+          <div class="header-bar">
+            <span class="welcome-text">Hi, {{ userName }} 👋</span>
+          </div>
         </div>
       </div>
 
