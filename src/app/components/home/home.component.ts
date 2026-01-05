@@ -47,4 +47,10 @@ async loadDashboard(month: number, year: number) {
 }
   this.loading.set(false);
 }
+
+async onCategorySelected(item: { category: string; amount: number; category_id?: string }) {
+  console.log('Category clicked', item);
+  // Open bottom-sheet / popup with category_id and month/year (you already have implementation)
+  // e.g. this.openExpenseBottomSheet(item.category_id, item.category);
+}
 }

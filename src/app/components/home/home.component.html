@@ -5,7 +5,9 @@
   </app-summary-bar>
 
   <app-category-chart
-    [data]="dashboard()?.categoryWise">
+    [data]="dashboard()?.categoryWise"
+    [topN]="5"
+    (selectCategory)="onCategorySelected($event)">
   </app-category-chart>
 
   <app-budget-vs-spend

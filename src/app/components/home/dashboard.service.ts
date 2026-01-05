@@ -71,12 +71,12 @@ export class DashboardService {
   async getCategoryBreakdown(month: number, year: number): Promise<CategoryBreakdown[]> {
     const familyId = this.requireFamilyId();
 
-    const { data, error } = await this.supabase.rpc('category_spending_breakdown', {
+    const { data, error } = await this.supabase.rpc('get_category_insights', {
       p_family_id: familyId,
-      p_month: month,
-      p_year: year
+      p_month: 10,
+      p_year: 2025
     });
-
+console.log('Category Breakdown Data:', data, 'Error:', error);
     if (error) throw error;
     return data ?? [];
   }
@@ -196,7 +196,7 @@ console.log('Recent Expense Data:', data, 'Error:', error);
   const [
     summaryExpense,
     summaryIncome,
-    //categoryWise,
+    categoryWise,
     budget,
     //credit,
     recentTxns,
@@ -205,7 +205,7 @@ console.log('Recent Expense Data:', data, 'Error:', error);
   ] = await Promise.all([
     this.getMonthlyExpense(month, year),
     this.getMonthlyIncome(month, year),
-    //this.getCategoryBreakdown(month, year),
+    this.getCategoryBreakdown(month, year),
     this.getBudgetVsSpending(month, year),
     //this.getCreditCardExpense(month, year),
     this.getRecentExpense(),
@@ -220,7 +220,7 @@ console.log('monthly summaryExpense :', summaryExpense);
       expense: summaryExpense,
       savings: savings
     },
-    //categoryWise,
+    categoryWise,
     budget,
     //credit,
     recentTxns,

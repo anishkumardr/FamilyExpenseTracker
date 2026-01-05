@@ -25,7 +25,7 @@ export class ExpensePopupComponent {
   paymentMethods = ['upi', 'credit', 'cash','cc'];
    successMessage = '';
   // toggle easy/manual
-  entryMode: 'easy' | 'manual' = 'easy';
+  entryMode: 'easy' | 'manual' = 'manual';
 constructor(private expenseService: ExpenseService,private dialog: MatDialog,private parserService: ExpenseParserService) {}
   // Manual entry model
  model: Partial<Expense> = {

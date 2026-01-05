@@ -1,9 +1,19 @@
 <div class="card">
-  <h3>Category Wise Spending</h3>
-  <div class="placeholder">[ Chart Will Appear Here ]</div>
 
-  <div class="list" *ngFor="let item of data">
-    <div class="label">{{ item.category }}</div>
-    <div class="value">{{ item.amount }}</div>
+  <h3>Category Wise Spending</h3>
+
+  <apx-chart
+    *ngIf="chartOptions"
+    [series]="chartOptions.series!"
+    [chart]="chartOptions.chart"
+    [labels]="chartOptions.labels!"
+    [legend]="chartOptions.legend"
+    [dataLabels]="chartOptions.dataLabels">
+  </apx-chart>
+
+  <div class="list" *ngFor="let item of processedList">
+    <div class="label">{{ item.category_name }}</div>
+    <div class="value">₹{{ item.total_spent | number }}</div>
   </div>
+
 </div>
