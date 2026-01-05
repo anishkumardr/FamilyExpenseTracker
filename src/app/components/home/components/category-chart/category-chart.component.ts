@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { NgApexchartsModule } from 'ng-apexcharts';
 
 export type ChartOptions = {
@@ -20,6 +20,12 @@ export type ChartOptions = {
 export class CategoryChartComponent implements OnChanges {
 
   @Input() data: any[] = [];
+  @Input() topN = 5;
+  @Output() selectCategory = new EventEmitter<{
+  category: string;
+  amount: number;
+  category_id?: string;
+}>();
 
   chartOptions: Partial<ChartOptions> | null = null;
   processedList: any[] = [];
