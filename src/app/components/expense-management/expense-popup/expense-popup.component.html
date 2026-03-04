@@ -23,8 +23,23 @@
 <div *ngIf="amountCtrl.invalid && amountCtrl.touched" class="error">
     Amount is required.
   </div>
-  
-<div *ngIf="frequentCategories" class="category-chips">
+
+  <!-- Entry Type Toggle (Expense vs Savings) + Date Picker Row -->
+  <div class="toggle-date-row">
+    <div class="entry-type-toggle">
+      <mat-slide-toggle
+        [checked]="entryType === 'saving'"
+        (change)="selectEntryType($event.checked ? 'saving' : 'expense')"
+        [disabled]="isEditing"
+        class="type-toggle"
+      >
+        <span class="toggle-label">{{ entryType === 'expense' ? 'Expense' : 'Savings' }}</span>
+      </mat-slide-toggle>
+    </div>
+    <input type="date" [(ngModel)]="model.occurred_at" name="date" class="input" />
+  </div>
+
+<div *ngIf="entryType === 'expense' && frequentCategories && frequentCategories.length > 0" class="category-chips">
   <button type="button"
     *ngFor="let cat of frequentCategories"
     class="chip"
@@ -40,14 +55,51 @@
     Others
   </button>
 </div>
-     <select *ngIf="showCategoryDropdown == true" [(ngModel)]="model.category_id" name="category" class="input" required #categoryCtrl="ngModel">
-    <option value="">Select Category</option>
-    <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}</option>
-    </select>
-<!-- <div *ngIf="categoryCtrl.invalid && categoryCtrl.touched" class="error">
-    Category is required.
-  </div> -->
-<div class="payment-buttons">
+
+<!-- If no frequent categories, show dropdown directly -->
+<select *ngIf="entryType === 'expense' && (!frequentCategories || frequentCategories.length === 0)" [(ngModel)]="model.category_id" name="category" class="input" required #categoryCtrl="ngModel">
+  <option value="">Select Category</option>
+  <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}</option>
+</select>
+
+<!-- Show dropdown if Others was clicked and there ARE frequent categories -->
+<select *ngIf="entryType === 'expense' && frequentCategories && frequentCategories.length > 0 && showCategoryDropdown == true" [(ngModel)]="model.category_id" name="category" class="input" required #categoryCtrl="ngModel">
+  <option value="">Select Category</option>
+  <option *ngFor="let c of categories" [value]="c.id">{{ c.category_name }}</option>
+</select>
+
+<!-- Savings Categories -->
+<div *ngIf="entryType === 'saving' && frequentSavingsCategories && frequentSavingsCategories.length > 0" class="category-chips">
+  <button type="button"
+    *ngFor="let cat of frequentSavingsCategories"
+    class="chip"
+    [class.selected]="model.category_id === cat.category_id"
+    (click)="selectCategory(cat)"
+  >
+    {{ cat.categories.category_name }}
+  </button>
+  <button type="button" class="chip"
+    (click)="showCategoryDropdownMethod()"
+    [class.selected]="showCategoryDropdown == true"
+  >
+    Others
+  </button>
+</div>
+
+<!-- If no frequent savings categories, show dropdown directly -->
+<select *ngIf="entryType === 'saving' && (!frequentSavingsCategories || frequentSavingsCategories.length === 0)" [(ngModel)]="model.category_id" name="savingCategory" class="input" required>
+  <option value="">Select Savings Category</option>
+  <option *ngFor="let c of savingsCategories" [value]="c.id">{{ c.category_name }}</option>
+</select>
+
+<!-- Show dropdown if Others was clicked and there ARE frequent savings categories -->
+<select *ngIf="entryType === 'saving' && frequentSavingsCategories && frequentSavingsCategories.length > 0 && showCategoryDropdown == true" [(ngModel)]="model.category_id" name="savingCategory" class="input" required>
+  <option value="">Select Savings Category</option>
+  <option *ngFor="let c of savingsCategories" [value]="c.id">{{ c.category_name }}</option>
+</select>
+
+<!-- Payment Methods - Only show for Expense -->
+<div *ngIf="entryType === 'expense'" class="payment-buttons">
   <button type="button"
     *ngFor="let method of paymentMethods"
     [class.active]="model.payment_method === method"
@@ -65,13 +117,12 @@
  <div *ngIf="typeCtrl.invalid && typeCtrl.touched" class="error">
     Expense type is required.
   </div> -->
-      <input type="date" [(ngModel)]="model.occurred_at" name="date" class="input" />
       <textarea [(ngModel)]="model.description" name="note" placeholder="Notes" class="input" required #noteCtrl="ngModel"></textarea>
 <div *ngIf="noteCtrl.invalid && noteCtrl.touched" class="error">
     Notes are required.
   </div>
 
-      <input type="file" (change)="onFileSelected($event)" class="input" />
+      <!-- <input type="file" (change)="onFileSelected($event)" class="input" /> -->
 
       
       <div class="actions">

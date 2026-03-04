@@ -2,9 +2,12 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Expense } from '../../../models/expense.model';
+import { Saving } from '../../../models/savings.model';
 import { ExpenseService } from '../../../services/expense.service';
+import { SavingService } from '../../../services/savings.service';
 import { ExpenseParserService } from '../../../services/expense-parser.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { firstValueFrom } from 'rxjs';
 import { Category } from '../../../models/category.model';
@@ -12,7 +15,7 @@ import { Category } from '../../../models/category.model';
 @Component({
   selector: 'app-expense-popup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatSlideToggleModule],
   templateUrl: './expense-popup.component.html',
   styleUrls: ['./expense-popup.component.scss']
 })
@@ -21,12 +24,23 @@ export class ExpensePopupComponent {
   @Output() close = new EventEmitter<boolean>();
   @Input() categories: { id: string, category_name: string }[] = [];
   @Input() frequentCategories: { id: string,category_id:string, categories: Category }[] = [];
+  @Input() savingsCategories: { id: string, category_name: string }[] = [];
+  @Input() frequentSavingsCategories: { id: string, category_id: string, categories: Category }[] = [];
+
   showCategoryDropdown = false;
   paymentMethods = ['upi', 'credit', 'cash','cc'];
    successMessage = '';
   // toggle easy/manual
   entryMode: 'easy' | 'manual' = 'manual';
-constructor(private expenseService: ExpenseService,private dialog: MatDialog,private parserService: ExpenseParserService) {}
+  entryType: 'expense' | 'saving' = 'expense';
+  isEditing = false;
+
+constructor(
+    private expenseService: ExpenseService,
+    private savingService: SavingService,
+    private dialog: MatDialog,
+    private parserService: ExpenseParserService
+  ) {}
   // Manual entry model
  model: Partial<Expense> = {
     amount: 0,
@@ -44,9 +58,10 @@ constructor(private expenseService: ExpenseService,private dialog: MatDialog,pri
 //   });
 // }
 ngOnChanges(changes:SimpleChanges) {
- 
+
   if (this.expense) {
     this.entryMode = 'manual'; // force manual for edit
+    this.isEditing = true;
     console.log('Editing expense, switching to manual mode:', this.expense);
     this.model = {
       amount: this.expense.amount,
@@ -57,7 +72,9 @@ ngOnChanges(changes:SimpleChanges) {
       receipt_path: ''
     };
   } else {
-    this.entryMode = 'easy'; // default for new entry
+    this.entryMode = 'manual'; // default for new entry
+    this.isEditing = false;
+    this.entryType = 'expense'; // Reset to expense for new entry
   }
 }
    closePopup(refresh: boolean = true) {
@@ -67,6 +84,11 @@ ngOnChanges(changes:SimpleChanges) {
   switchMode(mode: 'easy' | 'manual') {
     this.entryMode = mode;
   }
+
+  selectEntryType(type: 'expense' | 'saving') {
+    this.entryType = type;
+  }
+
   selectCategory(cat: any) {
     console.log('Category selected:', cat);
     this.model.category_id = cat.category_id;
@@ -81,21 +103,48 @@ ngOnChanges(changes:SimpleChanges) {
 //   }
   async submitManualEntry() {
     console.log('Manual entry model:', this.model);
-    if (!this.model.amount || !this.model.category_id || !this.model.payment_method || !this.model.description) {
+    if (!this.model.amount || !this.model.category_id || !this.model.description) {
     alert('Please fill all required fields.');
     return;
   }
-    console.log('Submitting manual entry:', this.model);
-    if (this.expense) {
-      // Update
-      await this.expenseService.updateExpense({ ...this.model, id: this.expense.id } as Expense);
-       this.closePopup(true);
-    } else {
-      // Add new
-      console.log('Adding expense:', this.model);
-      this.expenseService.addExpense(this.model as Expense);
-         this.closePopup(true);
 
+    if (this.entryType === 'expense') {
+      if (!this.model.payment_method) {
+        alert('Please select a payment method.');
+        return;
+      }
+
+      console.log('Submitting manual entry:', this.model);
+      if (this.expense) {
+        // Update expense
+        await this.expenseService.updateExpense({ ...this.model, id: this.expense.id } as Expense);
+         this.closePopup(true);
+      } else {
+        // Add new expense
+        console.log('Adding expense:', this.model);
+        this.expenseService.addExpense(this.model as Expense);
+           this.closePopup(true);
+      }
+    } else {
+      // Savings mode
+      const savingData: Partial<Saving> = {
+        amount: this.model.amount,
+        category_id: this.model.category_id,
+        date_saved: this.model.occurred_at,
+        comments: this.model.description,
+        recurring: false
+      };
+
+      if (this.expense) {
+        // Update saving
+        await this.savingService.updateSaving({ ...savingData, id: this.expense.id } as Saving).toPromise();
+        this.closePopup(true);
+      } else {
+        // Add new saving
+        console.log('Adding saving:', savingData);
+        await this.savingService.addSaving(savingData as Saving).toPromise();
+        this.closePopup(true);
+      }
     }
   }
 

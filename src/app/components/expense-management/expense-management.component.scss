@@ -73,10 +73,23 @@
     font-size: 18px;
     color: #ffffff; /* Header text on dark bg */
   }
-  .view-all {
-    font-size: 14px;
-    color: #4fc3f7; /* Link color for visibility */
-    text-decoration: none;
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #4fc3f7 !important;
+    font-size: 14px !important;
+    text-transform: none !important;
+    padding: 6px 12px !important;
+
+    .material-icons {
+      font-size: 18px;
+    }
+
+    &:hover {
+      background-color: rgba(79, 195, 247, 0.1) !important;
+    }
   }
 }
 
@@ -165,4 +178,71 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
   border: none;
   z-index: 1000;  // higher than nav + grid
+}
+
+/* Transaction Icon and Badge */
+.transaction-icon-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+
+  .material-icons {
+    font-size: 32px;
+    margin-right: 4px;
+  }
+
+  .expense-icon {
+    color: #ff5252; /* Red for expenses */
+  }
+
+  .saving-icon {
+    color: #4caf50; /* Green for savings */
+  }
+
+  .transaction-badge {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 8px;
+    font-weight: bold;
+    color: white;
+
+    &.expense-badge {
+      background-color: #ff5252;
+    }
+
+    &.saving-badge {
+      background-color: #4caf50;
+    }
+  }
+}
+
+/* Expense/Saving Card Styling */
+.expense-card {
+  &.saving-card {
+    background-color: rgba(76, 175, 80, 0.1); /* Light green background for savings */
+    border-left: 4px solid #4caf50;
+  }
+}
+
+/* Amount Styling */
+.expense-right {
+  font-weight: bold;
+  font-size: 14px;
+  color: #ff5252; /* Red for expenses by default */
+
+  .expense-symbol {
+    margin-right: 2px;
+  }
+
+  &.saving-amount {
+    color: #4caf50; /* Green for savings */
+
+    .saving-symbol {
+      margin-right: 2px;
+    }
+  }
 }

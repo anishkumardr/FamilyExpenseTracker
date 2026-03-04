@@ -109,3 +109,69 @@ button.selected, .payment-buttons button.active {
   color: white;
   border-color: #2196f3;
 }
+
+/* Premium Entry Type Toggle */
+.entry-type-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.8rem 0;
+  padding: 8px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 8px;
+
+  ::ng-deep {
+    .mat-mdc-slide-toggle {
+      margin: 0 6px;
+    }
+
+    .mdc-switch {
+      height: 16px;
+      width: 32px;
+
+      .mdc-switch__track {
+        background-color: #bdbdbd;
+      }
+
+      &.mdc-switch--checked .mdc-switch__track {
+        background-color: #66bb6a;
+      }
+
+      &.mdc-switch--checked .mdc-switch__thumb {
+        background-color: #2e7d32;
+      }
+
+      &.mdc-switch--disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .toggle-label {
+    font-weight: 600;
+    font-size: 12px;
+    color: #1976d2;
+    margin-left: 6px;
+    min-width: 55px;
+    text-align: center;
+  }
+}
+
+/* Toggle and Date Row */
+.toggle-date-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 0.8rem;
+
+  .entry-type-toggle {
+    flex: 1;
+    margin: 0;
+  }
+
+  .input {
+    flex: 1;
+    margin: 0;
+  }
+}

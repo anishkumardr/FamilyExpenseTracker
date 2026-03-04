@@ -52,25 +52,44 @@ export class SavingService {
     map((res: any) => {
         console.log('Fetched savings:', res);
       const savings: any[] = res.data || [];
-      const grouped: { [month: string]: Saving[] } = {};
+      const grouped: { [key: string]: Saving[] } = {};
 
       savings.forEach(s => {
         console.log('Processing saving:', s);
-        const month = new Date(s.date_saved).toLocaleString('default', { month: 'long', year: 'numeric' });
-        if (!grouped[month]) grouped[month] = [];
+        const dateKey = new Date(s.date_saved).toDateString();
+        if (!grouped[dateKey]) grouped[dateKey] = [];
         const saving = s as Saving;
-        console.log('Adding saving to group:', month, saving);
-        grouped[month].push({
+        console.log('Adding saving to group:', dateKey, saving);
+        grouped[dateKey].push({
           ...saving,
           category_name: s.category.category_name,
           icon: s.icon || 'assets/icons/category/default_category_Icon.png'
         });
       });
 console.log('Grouped savings:', grouped);
-      return Object.keys(grouped).map(month => ({
-        month,
-        items: grouped[month]
-      }));
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(today.getDate() - 1);
+      const todayStr = today.toDateString();
+      const yesterdayStr = yesterday.toDateString();
+
+      return Object.keys(grouped).map(dateKey => {
+        let label: string;
+        if (dateKey === todayStr) {
+          label = 'Today';
+        } else if (dateKey === yesterdayStr) {
+          label = 'Yesterday';
+        } else {
+          label = dateKey;
+        }
+
+        const savingDate = new Date(dateKey);
+        return {
+          date: label,
+          isCurrentMonth: savingDate.getMonth() === today.getMonth() && savingDate.getFullYear() === today.getFullYear(),
+          items: grouped[dateKey]
+        };
+      });
     })
   );
 }
