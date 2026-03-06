@@ -149,7 +149,7 @@
                   (click)="showCategoryDropdown = !showCategoryDropdown"
                 >
                   <span *ngIf="workingFilter.typeTab.categories.length === 0" class="placeholder">
-                    Select categories
+                    -- Select --
                   </span>
                   <span *ngIf="workingFilter.typeTab.categories.length > 0" class="selected-count">
                     {{ workingFilter.typeTab.categories.length }} selected
@@ -188,7 +188,7 @@
                   (click)="showPaymentDropdown = !showPaymentDropdown"
                 >
                   <span *ngIf="!selectedPaymentMethod" class="placeholder">
-                    Select payment method
+                    -- Select --
                   </span>
                   <span *ngIf="selectedPaymentMethod" class="selected-value">
                     {{ selectedPaymentMethod | uppercase }}
