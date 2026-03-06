@@ -26,21 +26,219 @@
   <!-- Expenses Header -->
   <div class="expenses-header">
     <h3>{{ getHeaderText() }}</h3>
-    <button mat-button [matMenuTriggerFor]="filterMenu" class="filter-btn">
-      <span class="material-icons">filter_list</span>
-      Filter
-    </button>
-    <mat-menu #filterMenu="matMenu">
-      <button mat-menu-item (click)="selectFilter('all')">
-        <span>All</span>
+    <div class="filter-button-wrapper" #filterButtonWrapper>
+      <button mat-button class="filter-btn" (click)="toggleFilterPanel()">
+        <span class="material-icons">filter_list</span>
+        Filter
       </button>
-      <button mat-menu-item (click)="selectFilter('current-month')">
-        <span>Current Month</span>
-      </button>
-      <button mat-menu-item (click)="selectFilter('last-month')">
-        <span>Last Month</span>
-      </button>
-    </mat-menu>
+
+      <!-- Advanced Filter Dropdown Panel -->
+      <div *ngIf="showAdvancedFilter" class="filter-dropdown-panel">
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button
+            class="tab-button"
+            [class.active]="activeTab === 'date'"
+            (click)="switchTab('date')"
+          >
+            Date
+          </button>
+          <button
+            class="tab-button"
+            [class.active]="activeTab === 'type'"
+            (click)="switchTab('type')"
+          >
+            Type
+          </button>
+        </div>
+
+        <!-- Date Tab -->
+        <div *ngIf="activeTab === 'date'" class="tab-content">
+          <div class="filter-section">
+            <h4>Date Range</h4>
+
+            <!-- Date Presets -->
+            <div class="date-presets">
+              <label class="preset-option">
+                <input
+                  type="radio"
+                  name="datePreset"
+                  [checked]="workingFilter.dateTab.preset === 'all' && !workingFilter.dateTab.customStart && !workingFilter.dateTab.customEnd"
+                  (change)="selectDatePreset('all')"
+                />
+                <span>All</span>
+              </label>
+              <label class="preset-option">
+                <input
+                  type="radio"
+                  name="datePreset"
+                  [checked]="workingFilter.dateTab.preset === 'current-month' && !workingFilter.dateTab.customStart"
+                  (change)="selectDatePreset('current-month')"
+                />
+                <span>Current Month</span>
+              </label>
+              <label class="preset-option">
+                <input
+                  type="radio"
+                  name="datePreset"
+                  [checked]="workingFilter.dateTab.preset === 'last-month' && !workingFilter.dateTab.customStart"
+                  (change)="selectDatePreset('last-month')"
+                />
+                <span>Last Month</span>
+              </label>
+            </div>
+
+            <!-- Custom Date Range -->
+            <div class="custom-date-range">
+              <label>
+                <span>Start Date</span>
+                <input
+                  type="date"
+                  #startDateInput
+                  [value]="workingFilter.dateTab.customStart || ''"
+                  (change)="setCustomDates(startDateInput.value, workingFilter.dateTab.customEnd || '')"
+                  class="date-input"
+                />
+              </label>
+              <label>
+                <span>End Date</span>
+                <input
+                  type="date"
+                  #endDateInput
+                  [value]="workingFilter.dateTab.customEnd || ''"
+                  (change)="setCustomDates(workingFilter.dateTab.customStart || '', endDateInput.value)"
+                  class="date-input"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Type Tab -->
+        <div *ngIf="activeTab === 'type'" class="tab-content">
+          <div class="filter-section">
+            <!-- Expense/Savings Checkboxes -->
+            <div class="filter-group">
+              <h4>Type</h4>
+              <div class="checkbox-group">
+                <label class="checkbox-option">
+                  <input
+                    type="checkbox"
+                    [checked]="workingFilter.typeTab.expenseTypes.expense"
+                    (change)="toggleExpenseType('expense')"
+                  />
+                  <span>Expense</span>
+                </label>
+                <label class="checkbox-option">
+                  <input
+                    type="checkbox"
+                    [checked]="workingFilter.typeTab.expenseTypes.saving"
+                    (change)="toggleExpenseType('saving')"
+                  />
+                  <span>Saving</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Categories Dropdown with Chips -->
+            <div class="filter-group">
+              <h4>Category</h4>
+              <div class="dropdown-wrapper">
+                <button
+                  class="dropdown-trigger"
+                  (click)="showCategoryDropdown = !showCategoryDropdown"
+                >
+                  <span *ngIf="workingFilter.typeTab.categories.length === 0" class="placeholder">
+                    Select categories
+                  </span>
+                  <span *ngIf="workingFilter.typeTab.categories.length > 0" class="selected-count">
+                    {{ workingFilter.typeTab.categories.length }} selected
+                  </span>
+                  <span class="material-icons">expand_more</span>
+                </button>
+
+                <!-- Category Chips -->
+                <div *ngIf="workingFilter.typeTab.categories.length > 0" class="chips-container">
+                  <span *ngFor="let cat of workingFilter.typeTab.categories" class="chip">
+                    {{ cat }}
+                    <button class="chip-remove" (click)="toggleCategory(cat)">×</button>
+                  </span>
+                </div>
+
+                <!-- Category Dropdown List -->
+                <div *ngIf="showCategoryDropdown" class="dropdown-list">
+                  <label *ngFor="let category of allCategoryNames" class="dropdown-item">
+                    <input
+                      type="checkbox"
+                      [checked]="workingFilter.typeTab.categories.includes(category)"
+                      (change)="toggleCategory(category)"
+                    />
+                    <span>{{ category }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Method Single Select Dropdown -->
+            <div class="filter-group">
+              <h4>Payment Method</h4>
+              <div class="dropdown-wrapper">
+                <button
+                  class="dropdown-trigger"
+                  (click)="showPaymentDropdown = !showPaymentDropdown"
+                >
+                  <span *ngIf="!selectedPaymentMethod" class="placeholder">
+                    Select payment method
+                  </span>
+                  <span *ngIf="selectedPaymentMethod" class="selected-value">
+                    {{ selectedPaymentMethod | uppercase }}
+                  </span>
+                  <span class="material-icons">expand_more</span>
+                </button>
+
+                <!-- Payment Dropdown List -->
+                <div *ngIf="showPaymentDropdown" class="dropdown-list">
+                  <label *ngFor="let method of paymentMethods" class="dropdown-item single-select">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      [checked]="selectedPaymentMethod === method"
+                      (change)="togglePaymentMethod(method)"
+                    />
+                    <span>{{ method | uppercase }}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes Search -->
+            <div class="filter-group">
+              <h4>Notes</h4>
+              <input
+                type="text"
+                class="notes-search"
+                placeholder="Search notes..."
+                #notesInput
+                [value]="workingFilter.typeTab.notesSearch"
+                (input)="updateNotesSearch(notesInput.value)"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Actions -->
+        <div class="filter-actions">
+          <button class="reset-btn" (click)="resetFilter()">
+            <span class="material-icons">refresh</span>
+            Reset
+          </button>
+          <button class="apply-btn" (click)="applyFilters()">
+            <span class="material-icons">check</span>
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Transactions List (Merged Expenses and Savings) -->

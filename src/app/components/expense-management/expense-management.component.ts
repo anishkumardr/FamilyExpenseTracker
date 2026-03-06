@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ExpenseService, ExpenseGroup } from '../../services/expense.service';
 import { SavingService } from '../../services/savings.service';
 import { Observable } from 'rxjs';
@@ -12,6 +12,23 @@ import { FrequencyService } from '../../services/frequency.service';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 
+// Advanced filter interface
+interface AdvancedFilter {
+  // Date filter
+  dateTab: {
+    preset: 'all' | 'current-month' | 'last-month' | null;
+    customStart: string | null;
+    customEnd: string | null;
+  };
+  // Type filter
+  typeTab: {
+    expenseTypes: { expense: boolean; saving: boolean };
+    categories: string[];
+    paymentMethods: string[];
+    notesSearch: string;
+  };
+}
+
 @Component({
   selector: 'app-expense-management',
   standalone: true,
@@ -23,7 +40,45 @@ export class ExpenseManagementComponent {
   expensesGrouped: ExpenseGroup[] = [];
   savingsGrouped: any[] = []; // Store savings separately
   transactionsGrouped: any[] = []; // Merged expenses and savings (all)
-  filteredTransactionsGrouped: any[] = []; // Filtered based on selected filter
+  filteredTransactionsGrouped: any[] = []; // Filtered based on advanced filter
+
+  // Actual applied filters
+  advancedFilter: AdvancedFilter = {
+    dateTab: {
+      preset: 'all',
+      customStart: null,
+      customEnd: null
+    },
+    typeTab: {
+      expenseTypes: { expense: true, saving: true },
+      categories: [],
+      paymentMethods: [],
+      notesSearch: ''
+    }
+  };
+
+  // Working filter state (temporary, before Apply is clicked)
+  workingFilter: AdvancedFilter = {
+    dateTab: {
+      preset: 'all',
+      customStart: null,
+      customEnd: null
+    },
+    typeTab: {
+      expenseTypes: { expense: true, saving: true },
+      categories: [],
+      paymentMethods: [],
+      notesSearch: ''
+    }
+  };
+
+  activeTab: 'date' | 'type' = 'date';
+  showAdvancedFilter = false;
+  showCategoryDropdown = false;
+  showPaymentDropdown = false;
+  selectedPaymentMethod: string | null = null;
+
+  @ViewChild('filterButtonWrapper', { static: false }) filterButtonWrapper?: ElementRef;
 
   totalRemaining = 0;
   groceryAmount = 0;
@@ -32,6 +87,7 @@ export class ExpenseManagementComponent {
   remainingAmountPercent: number = 100;
   categories: { id: string, category_name: string,category_type : string }[] = [];
   savingsCategories: { id: string, category_name: string }[] = [];
+  allCategoryNames: string[] = []; // All unique category names for filter
   showPopup = false;
   editingExpense: Expense | null = null;
   currentMonth = new Date().getMonth() + 1;
@@ -40,6 +96,41 @@ export class ExpenseManagementComponent {
   frequentSavingsCategories: any[] = [];
    private realtimeSubscription: any;
   selectedFilter: 'all' | 'current-month' | 'last-month' = 'all';
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // Check if click is outside filter wrapper (panel and button)
+    if (this.filterButtonWrapper && !this.filterButtonWrapper.nativeElement.contains(target)) {
+      // Close filter panel if clicking outside
+      if (this.showAdvancedFilter) {
+        this.toggleFilterPanel();
+      }
+    } else {
+      // Click is inside filter wrapper - close dropdowns if clicking outside them
+      // Check if click is outside category dropdown
+      const categoryDropdown = (this.filterButtonWrapper?.nativeElement as HTMLElement)?.querySelector('.dropdown-wrapper:has(.dropdown-list)');
+      if (this.showCategoryDropdown && categoryDropdown && !categoryDropdown.contains(target)) {
+        this.showCategoryDropdown = false;
+      }
+
+      // Check if click is outside payment dropdown
+      const paymentDropdowns = (this.filterButtonWrapper?.nativeElement as HTMLElement)?.querySelectorAll('.dropdown-wrapper');
+      if (this.showPaymentDropdown && paymentDropdowns) {
+        let isOutsidePayment = true;
+        paymentDropdowns.forEach((dropdown: any) => {
+          if (dropdown.contains(target)) {
+            isOutsidePayment = false;
+          }
+        });
+        if (isOutsidePayment) {
+          this.showPaymentDropdown = false;
+        }
+      }
+    }
+  }
+
   constructor(
     private expenseService: ExpenseService,
     private frequencyService: FrequencyService,
@@ -145,42 +236,118 @@ export class ExpenseManagementComponent {
         isCurrentMonth: groupedByDate[date][0]?.isCurrentMonth || false
       }));
 
+    // Extract all unique category names for filter dropdown
+    const categorySet = new Set<string>();
+    allTransactions.forEach(transaction => {
+      if (transaction.category || transaction.category_name) {
+        categorySet.add(transaction.category || transaction.category_name);
+      }
+    });
+    this.allCategoryNames = Array.from(categorySet).sort();
+
     console.log('Merged transactions:', this.transactionsGrouped);
 
-    // Apply filter
-    this.applyFilter();
+    // Apply advanced filter
+    this.applyAdvancedFilter();
   }
 
-  applyFilter() {
+  applyAdvancedFilter() {
     const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    const filter = this.advancedFilter;
 
-    // Calculate last month
-    let lastMonthDate = new Date(currentYear, currentMonth - 1, 1);
-    if (currentMonth === 0) {
-      lastMonthDate = new Date(currentYear - 1, 11, 1);
-    }
-    const lastMonth = lastMonthDate.getMonth();
-    const lastYear = lastMonthDate.getFullYear();
+    // Helper function to check if transaction passes date filter
+    const passesDateFilter = (groupDate: string): boolean => {
+      const dateObj = new Date(groupDate);
+      const dateMonth = dateObj.getMonth();
+      const dateYear = dateObj.getFullYear();
+      const todayMonth = today.getMonth();
+      const todayYear = today.getFullYear();
 
-    this.filteredTransactionsGrouped = this.transactionsGrouped.filter(group => {
-      const groupDate = new Date(group.date);
-      const groupMonth = groupDate.getMonth();
-      const groupYear = groupDate.getFullYear();
+      // If custom date range is set, use it; otherwise use preset
+      if (filter.dateTab.customStart || filter.dateTab.customEnd) {
+        // Custom date filter
+        let startDate: Date | null = null;
+        let endDate: Date | null = null;
 
-      switch (this.selectedFilter) {
+        if (filter.dateTab.customStart) {
+          startDate = new Date(filter.dateTab.customStart);
+          startDate.setHours(0, 0, 0, 0);
+        }
+
+        if (filter.dateTab.customEnd) {
+          endDate = new Date(filter.dateTab.customEnd);
+          endDate.setHours(23, 59, 59, 999);
+        } else {
+          endDate = new Date();
+          endDate.setHours(23, 59, 59, 999);
+        }
+
+        dateObj.setHours(0, 0, 0, 0);
+
+        if (startDate && dateObj < startDate) return false;
+        if (endDate && dateObj > endDate) return false;
+        return true;
+      }
+
+      // Preset filter
+      switch (filter.dateTab.preset) {
         case 'current-month':
-          return groupMonth === currentMonth && groupYear === currentYear;
+          return dateMonth === todayMonth && dateYear === todayYear;
         case 'last-month':
-          return groupMonth === lastMonth && groupYear === lastYear;
+          let lastMonthDate = new Date(todayYear, todayMonth - 1, 1);
+          if (todayMonth === 0) {
+            lastMonthDate = new Date(todayYear - 1, 11, 1);
+          }
+          const lastMonth = lastMonthDate.getMonth();
+          const lastYear = lastMonthDate.getFullYear();
+          return dateMonth === lastMonth && dateYear === lastYear;
         case 'all':
         default:
           return true;
       }
-    });
+    };
 
-    console.log('Filtered transactions for filter:', this.selectedFilter, this.filteredTransactionsGrouped);
+    // Helper function to check if transaction passes type filter
+    const passesTypeFilter = (transaction: any): boolean => {
+      // Check expense type filter
+      if (transaction.type === 'expense' && !filter.typeTab.expenseTypes.expense) return false;
+      if (transaction.type === 'saving' && !filter.typeTab.expenseTypes.saving) return false;
+
+      // Check category filter (only if categories are selected)
+      if (filter.typeTab.categories.length > 0) {
+        const txCategory = transaction.category || transaction.category_name;
+        if (!filter.typeTab.categories.includes(txCategory)) return false;
+      }
+
+      // Check payment method filter (only if methods are selected)
+      if (filter.typeTab.paymentMethods.length > 0) {
+        if (!filter.typeTab.paymentMethods.includes(transaction.payment_method)) return false;
+      }
+
+      // Check notes search filter (case-insensitive contains)
+      if (filter.typeTab.notesSearch.trim()) {
+        const description = (transaction.description || '').toLowerCase();
+        const searchTerm = filter.typeTab.notesSearch.toLowerCase();
+        if (!description.includes(searchTerm)) return false;
+      }
+
+      return true;
+    };
+
+    // Apply filters to all transactions
+    this.filteredTransactionsGrouped = this.transactionsGrouped
+      .map(group => ({
+        ...group,
+        items: group.items.filter((transaction: any) => passesDateFilter(group.date) && passesTypeFilter(transaction))
+      }))
+      .filter(group => group.items.length > 0); // Remove empty groups
+
+    console.log('Filtered transactions:', this.filteredTransactionsGrouped);
+  }
+
+  applyFilter() {
+    // Legacy method - kept for backwards compatibility
+    this.applyAdvancedFilter();
   }
 
   loadRemainingAmount() {
@@ -217,20 +384,134 @@ export class ExpenseManagementComponent {
     this.openPopup(expense);
   }
 
-  selectFilter(filter: 'all' | 'current-month' | 'last-month') {
-    this.selectedFilter = filter;
-    this.applyFilter();
+  // Advanced filter methods
+  toggleFilterPanel() {
+    if (this.showAdvancedFilter) {
+      // Reset working to applied when closing
+      this.workingFilter = JSON.parse(JSON.stringify(this.advancedFilter));
+    } else {
+      // When opening, sync working with applied
+      this.workingFilter = JSON.parse(JSON.stringify(this.advancedFilter));
+      this.updateSelectedPaymentMethod();
+    }
+    this.showAdvancedFilter = !this.showAdvancedFilter;
+    this.showCategoryDropdown = false;
+    this.showPaymentDropdown = false;
+  }
+
+  switchTab(tab: 'date' | 'type') {
+    this.activeTab = tab;
+  }
+
+  selectDatePreset(preset: 'all' | 'current-month' | 'last-month') {
+    this.workingFilter.dateTab.preset = preset;
+    this.workingFilter.dateTab.customStart = null;
+    this.workingFilter.dateTab.customEnd = null;
+  }
+
+  setCustomDates(startDate: string, endDate: string) {
+    this.workingFilter.dateTab.customStart = startDate || null;
+    this.workingFilter.dateTab.customEnd = endDate || null;
+    this.workingFilter.dateTab.preset = null;
+  }
+
+  toggleExpenseType(type: 'expense' | 'saving') {
+    this.workingFilter.typeTab.expenseTypes[type] = !this.workingFilter.typeTab.expenseTypes[type];
+  }
+
+  toggleCategory(category: string) {
+    const index = this.workingFilter.typeTab.categories.indexOf(category);
+    if (index > -1) {
+      this.workingFilter.typeTab.categories.splice(index, 1);
+    } else {
+      this.workingFilter.typeTab.categories.push(category);
+    }
+  }
+
+  togglePaymentMethod(method: string) {
+    // Single select for payment method
+    if (this.workingFilter.typeTab.paymentMethods.includes(method)) {
+      this.workingFilter.typeTab.paymentMethods = [];
+    } else {
+      this.workingFilter.typeTab.paymentMethods = [method];
+    }
+    this.updateSelectedPaymentMethod();
+    // Close dropdown after selection
+    this.showPaymentDropdown = false;
+  }
+
+  updateSelectedPaymentMethod() {
+    this.selectedPaymentMethod = this.workingFilter.typeTab.paymentMethods.length > 0
+      ? this.workingFilter.typeTab.paymentMethods[0]
+      : null;
+  }
+
+  updateNotesSearch(search: string) {
+    this.workingFilter.typeTab.notesSearch = search;
+  }
+
+  // Apply filters and close panel
+  applyFilters() {
+    this.advancedFilter = JSON.parse(JSON.stringify(this.workingFilter));
+    this.applyAdvancedFilter();
+    this.closeFilterPanel();
+  }
+
+  // Reset filters and apply defaults
+  resetFilter() {
+    this.workingFilter = {
+      dateTab: {
+        preset: 'all',
+        customStart: null,
+        customEnd: null
+      },
+      typeTab: {
+        expenseTypes: { expense: true, saving: true },
+        categories: [],
+        paymentMethods: [],
+        notesSearch: ''
+      }
+    };
+    this.advancedFilter = JSON.parse(JSON.stringify(this.workingFilter));
+    this.applyAdvancedFilter();
+    this.closeFilterPanel();
+  }
+
+  // Close filter panel
+  closeFilterPanel() {
+    this.showAdvancedFilter = false;
+    this.showCategoryDropdown = false;
+    this.showPaymentDropdown = false;
   }
 
   getHeaderText(): string {
-    switch (this.selectedFilter) {
-      case 'current-month':
-        return 'Current Month';
-      case 'last-month':
-        return 'Last Month';
-      default:
-        return 'All Transactions';
+    const filter = this.advancedFilter;
+
+    // Check if any filters are applied
+    const hasDateFilter = filter.dateTab.preset !== 'all' || filter.dateTab.customStart || filter.dateTab.customEnd;
+    const hasTypeFilter = !filter.typeTab.expenseTypes.expense || !filter.typeTab.expenseTypes.saving ||
+                          filter.typeTab.categories.length > 0 || filter.typeTab.paymentMethods.length > 0 ||
+                          filter.typeTab.notesSearch.trim() !== '';
+
+    if (!hasDateFilter && !hasTypeFilter) {
+      return 'All Transactions';
     }
+
+    let headerParts: string[] = [];
+
+    if (filter.dateTab.preset === 'current-month') {
+      headerParts.push('Current Month');
+    } else if (filter.dateTab.preset === 'last-month') {
+      headerParts.push('Last Month');
+    } else if (filter.dateTab.customStart || filter.dateTab.customEnd) {
+      headerParts.push('Custom Date Range');
+    }
+
+    if (hasTypeFilter) {
+      headerParts.push('Filtered');
+    }
+
+    return headerParts.length > 0 ? headerParts.join(' - ') : 'All Transactions';
   }
 
   async onDeleteTransaction(transaction: any) {

@@ -6,7 +6,15 @@
             <mat-icon>{{ lightTheme ? 'dark_mode' : 'light_mode' }}</mat-icon>
           </button>
           <div class="header-bar">
-            <span class="welcome-text">Hi, {{ userName }} 👋</span>
+            <button mat-button [matMenuTriggerFor]="userMenu" class="username-btn">
+              <span class="welcome-text">Hi, {{ userName }} 👋</span>
+            </button>
+            <mat-menu #userMenu="matMenu" panelClass="user-menu-panel">
+              <button mat-menu-item (click)="logout()">
+                <span class="material-icons">logout</span>
+                Logout
+              </button>
+            </mat-menu>
           </div>
         </div>
       </div>

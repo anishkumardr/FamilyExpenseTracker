@@ -1,15 +1,16 @@
 <div class="login-container">
-  <h2>Login</h2>
-
   <form (ngSubmit)="onLogin()">
-    <label>User Name:</label>
-    <input type="username" [(ngModel)]="username" name="username" required />
+    <h2>Family Tracker</h2>
+    <div class="subtitle">Manage your family expenses wisely</div>
 
-    <label>Password:</label>
-    <input type="password" [(ngModel)]="password" name="password" required />
+    <label>User Name</label>
+    <input type="text" [(ngModel)]="username" name="username" placeholder="Enter your username" required />
 
-    <button type="submit" [disabled]="loading">Login</button>
+    <label>Password</label>
+    <input type="password" [(ngModel)]="password" name="password" placeholder="Enter your password" required />
+
+    <button type="submit" [disabled]="loading">{{ loading ? 'Logging in...' : 'Login' }}</button>
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
   </form>
-
-  <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 </div>

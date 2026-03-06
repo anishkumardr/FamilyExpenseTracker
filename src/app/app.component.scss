@@ -9,4 +9,44 @@
     .nav-item.active { color:var(--accent); }
     .nav-item mat-icon { font-size:22px; margin-bottom:4px; }
     .fab { position:fixed; right:16px; bottom:82px; background:var(--accent); color:#fff; box-shadow:0 6px 18px rgba(30,136,229,0.24); }
+
+    .username-btn {
+      color: var(--text) !important;
+      font-size: 14px !important;
+      text-transform: none !important;
+      padding: 6px 12px !important;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(30, 136, 229, 0.1) !important;
+      }
+    }
+
+    ::ng-deep .user-menu-panel {
+      max-width: 120px !important;
+
+      .mat-mdc-menu-content {
+        padding: 2px 0 !important;
+      }
+
+      .mat-mdc-menu-item {
+        font-size: 12px !important;
+        height: 32px !important;
+        line-height: 32px !important;
+        padding: 0 8px !important;
+        min-width: auto !important;
+
+        .material-icons {
+          font-size: 16px !important;
+          margin-right: 4px !important;
+        }
+      }
+    }
+
+    .welcome-text {
+      display: inline-block;
+    }
+
     @media(min-width:720px) { .page-body { padding:24px 48px; } .bottom-nav { max-width:720px; margin:0 auto; border-radius:12px 12px 0 0; } .fab{right:32px} }
