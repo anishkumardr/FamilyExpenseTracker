@@ -209,6 +209,7 @@ private subscription: any;
       amount: expense.amount,
       payment_method: expense.payment_method,
       description: expense.description,
+      occurred_at: expense.occurred_at 
       // add other fields if needed
     })
     .eq('id', expense.id)

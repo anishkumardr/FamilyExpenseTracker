@@ -63,11 +63,16 @@ ngOnChanges(changes:SimpleChanges) {
     this.entryMode = 'manual'; // force manual for edit
     this.isEditing = true;
     console.log('Editing expense, switching to manual mode:', this.expense);
+    this.entryType = this.expense.type === 'saving' ? 'saving' : 'expense';
+    if(this.entryType == 'saving')
+      {
+        this.expense.occurred_at = this.expense.date_saved;
+      } 
     this.model = {
       amount: this.expense.amount,
       category_id: this.expense.category_id,
       payment_method: this.expense.payment_method || 'cash',
-      occurred_at: this.expense.occurred_at ? this.expense.occurred_at.substring(0, 10) : new Date().toISOString().substring(0, 10),
+      occurred_at:this.expense.occurred_at ? this.expense.occurred_at.substring(0, 10) : new Date().toISOString().substring(0, 10),
       description: this.expense.description,
       receipt_path: ''
     };

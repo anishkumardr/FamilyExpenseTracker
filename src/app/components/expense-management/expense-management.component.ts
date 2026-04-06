@@ -375,6 +375,7 @@ export class ExpenseManagementComponent {
     this.editingExpense = null;
     if (refresh) {
       this.loadExpenses();
+      this.loadSavings();
       this.loadRemainingAmount();
     }
   }

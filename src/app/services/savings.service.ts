@@ -55,11 +55,9 @@ export class SavingService {
       const grouped: { [key: string]: Saving[] } = {};
 
       savings.forEach(s => {
-        console.log('Processing saving:', s);
         const dateKey = new Date(s.date_saved).toDateString();
         if (!grouped[dateKey]) grouped[dateKey] = [];
         const saving = s as Saving;
-        console.log('Adding saving to group:', dateKey, saving);
         grouped[dateKey].push({
           ...saving,
           category_name: s.category.category_name,
