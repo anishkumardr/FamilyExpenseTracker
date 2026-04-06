@@ -45,7 +45,7 @@ export class ExpenseManagementComponent {
   // Actual applied filters
   advancedFilter: AdvancedFilter = {
     dateTab: {
-      preset: 'all',
+      preset: 'current-month',
       customStart: null,
       customEnd: null
     },
@@ -60,7 +60,7 @@ export class ExpenseManagementComponent {
   // Working filter state (temporary, before Apply is clicked)
   workingFilter: AdvancedFilter = {
     dateTab: {
-      preset: 'all',
+      preset: 'current-month',
       customStart: null,
       customEnd: null
     },
@@ -95,7 +95,7 @@ export class ExpenseManagementComponent {
   frequentCategories: any[] = [];
   frequentSavingsCategories: any[] = [];
    private realtimeSubscription: any;
-  selectedFilter: 'all' | 'current-month' | 'last-month' = 'all';
+  selectedFilter: 'all' | 'current-month' | 'last-month' = 'current-month';
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
