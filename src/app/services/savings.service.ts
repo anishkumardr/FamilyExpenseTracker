@@ -5,6 +5,7 @@ import { Saving } from '../models/savings.model';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../../environments/environments';
 import { AuthService } from './auth.service';
+import { ToastService } from './toast.service';
 
 @Injectable({
   providedIn: 'root'  // ✅ Add this
@@ -12,7 +13,7 @@ import { AuthService } from './auth.service';
 export class SavingService {
   private supabase: SupabaseClient;
 
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService, private toastService: ToastService) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
@@ -92,74 +93,104 @@ console.log('Grouped savings:', grouped);
   );
 }
   addSaving(saving: Saving): Observable<Saving> {
-  if (!this.authService.userId || !this.authService.familyId) {
-    throw new Error('User ID or Family ID not set');
-  }
-
-  const savingToInsert: Partial<Saving> = {
-    ...saving,
-    user_id: this.authService.userId,
-    family_id: this.authService.familyId,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
-
-  console.log('Adding saving to DB:', savingToInsert);
-
-  return from(
-    this.supabase
-      .from('savings')
-      .insert([savingToInsert])
-      .select()  // returns inserted record(s)
-  ).pipe(
-    map((res: any) => {
-      if (res.error) {
-        console.error('Error inserting saving:', res.error);
-        throw res.error;
+    try {
+      if (!this.authService.userId || !this.authService.familyId) {
+        throw new Error('User ID or Family ID not set');
       }
-      return res.data[0] as Saving; // return first inserted record
-    })
-  );
-}
+
+      const savingToInsert: Partial<Saving> = {
+        ...saving,
+        user_id: this.authService.userId,
+        family_id: this.authService.familyId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Adding saving to DB:', savingToInsert);
+
+      return from(
+        this.supabase
+          .from('savings')
+          .insert([savingToInsert])
+          .select()  // returns inserted record(s)
+      ).pipe(
+        map((res: any) => {
+          if (res.error) {
+            console.error('Error inserting saving:', res.error);
+            this.toastService.savingsError(res.error.message || 'Failed to add savings');
+            throw res.error;
+          }
+          this.toastService.savingsAdded();
+          return res.data[0] as Saving; // return first inserted record
+        })
+      );
+    } catch (error: any) {
+      console.error('Error in addSaving:', error);
+      this.toastService.savingsError(error.message || 'Failed to add savings');
+      throw error;
+    }
+  }
  updateSaving(saving: Saving): Observable<Saving> {
-  if (!saving.id) {
-    throw new Error('Saving ID is required for update');
+  try {
+    if (!saving.id) {
+      throw new Error('Saving ID is required for update');
+    }
+    console.log('Original saving data:', saving);
+    const { category,category_name,icon, ...updateData } = saving as any; // exclude category object if present
+    const savingToUpdate: Partial<Saving> = {
+      ...updateData,
+      updated_at: new Date().toISOString()  // update timestamp
+    };
+
+    console.log('Updating saving:', savingToUpdate);
+
+    return from(
+      this.supabase
+        .from('savings')
+        .update(savingToUpdate)
+        .eq('id', saving.id)
+        .select()  // returns updated record(s)
+    ).pipe(
+      map((res: any) => {
+        if (res.error) {
+          console.error('Error updating saving:', res.error);
+          this.toastService.savingsError(res.error.message || 'Failed to update savings');
+          throw res.error;
+        }
+        this.toastService.savingsUpdated();
+        return res.data[0] as Saving; // return first updated record
+      })
+    );
+  } catch (error: any) {
+    console.error('Error in updateSaving:', error);
+    this.toastService.savingsError(error.message || 'Failed to update savings');
+    throw error;
   }
-console.log('Original saving data:', saving);
-const { category,category_name,icon, ...updateData } = saving as any; // exclude category object if present
-  const savingToUpdate: Partial<Saving> = {
-    ...updateData,
-    updated_at: new Date().toISOString()  // update timestamp
-  };
-
-  console.log('Updating saving:', savingToUpdate);
-
-  return from(
-    this.supabase
-      .from('savings')
-      .update(savingToUpdate)
-      .eq('id', saving.id)
-      .select()  // returns updated record(s)
-  ).pipe(
-    map((res: any) => {
-      if (res.error) {
-        console.error('Error updating saving:', res.error);
-        throw res.error;
-      }
-      return res.data[0] as Saving; // return first updated record
-    })
-  );
 }
 
 
 
    deleteSaving(savingId: string): Observable<any> {
-    return from(
-      this.supabase
-        .from('savings')
-        .delete()
-        .eq('id', savingId)
-    ).pipe(map(res => res.data));
+    try {
+      return from(
+        this.supabase
+          .from('savings')
+          .delete()
+          .eq('id', savingId)
+      ).pipe(map((res: any) => {
+        if (res.error) {
+          console.error('Error deleting saving:', res.error);
+          this.toastService.savingsError(res.error.message || 'Failed to delete savings');
+          throw res.error;
+        }
+        this.toastService.savingsDeleted();
+        return res.data;
+      }));
+    } catch (error: any) {
+      console.error('Error in deleteSaving:', error);
+      this.toastService.savingsError(error.message || 'Failed to delete savings');
+      throw error;
+    }
   }
 
 }
