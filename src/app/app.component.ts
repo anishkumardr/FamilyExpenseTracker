@@ -7,21 +7,35 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { BottomNavComponent } from "./components/bottom-nav/bottom-nav.component";
 import { AuthService } from './services/auth.service';
+import { UpdateService } from './services/update.service';
+import { UpdatePromptComponent } from './components/update-prompt/update-prompt.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatMenuModule, BottomNavComponent],
+  imports: [CommonModule, RouterOutlet, MatIconModule, MatButtonModule, MatMenuModule, BottomNavComponent, UpdatePromptComponent],
   styleUrls: ['./app.component.scss'],
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit {
   users: any;
   userName = '';
-  constructor(private supabase: SupabaseService,private router: Router,private auth: AuthService) {
-    console.log('AppComponent constructor called.'); 
+  updateAvailable = false;
+
+  constructor(
+    private supabase: SupabaseService,
+    private router: Router,
+    private auth: AuthService,
+    private updateService: UpdateService
+  ) {
+    console.log('AppComponent constructor called.');
     this.userName = this.auth.getUserName();
-     console.log('AppComponent initialized. UserName:', this.userName);
+    console.log('AppComponent initialized. UserName:', this.userName);
+
+    // Subscribe to update availability
+    this.updateService.updateAvailable$.subscribe(available => {
+      this.updateAvailable = available;
+    });
   }
 showNav = true;
 lightTheme = false;
@@ -61,5 +75,10 @@ lightTheme = false;
     //     if (cur !== '/login') this.router.navigate(['/login']);
     //   }
     // });
+
+    // Check for updates every 30 minutes
+    setInterval(() => {
+      this.updateService.checkForUpdate();
+    }, 30 * 60 * 1000); // 30 minutes
   }
 }
