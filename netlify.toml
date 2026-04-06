@@ -1,6 +1,6 @@
 [build]
   command = "npm run build:netlify"
-  publish = "dist/family-Expense-Tracker"   # replace <PROJECT_NAME> with your angular.json project name
+  publish = "dist/family-expense-tracker/browser"
 
 [[redirects]]
   from = "/*"

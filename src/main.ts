@@ -13,13 +13,11 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
     importProvidersFrom(MatIconModule),
-    provideHttpClient(withInterceptorsFromDi()),provideAnimations(), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000',
-            
-          })  // <-- add this
+    provideHttpClient(withInterceptorsFromDi()),
+    provideAnimations(),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 });
