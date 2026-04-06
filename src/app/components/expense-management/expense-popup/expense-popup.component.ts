@@ -67,7 +67,7 @@ ngOnChanges(changes:SimpleChanges) {
     if(this.entryType == 'saving')
       {
         this.expense.occurred_at = this.expense.date_saved;
-      } 
+      }
     this.model = {
       amount: this.expense.amount,
       category_id: this.expense.category_id,
@@ -76,10 +76,22 @@ ngOnChanges(changes:SimpleChanges) {
       description: this.expense.description,
       receipt_path: ''
     };
+
+    // Check if the current category is in frequent categories
+    // If not, automatically show the dropdown
+    this.checkAndShowCategoryDropdown();
   } else {
     this.entryMode = 'manual'; // default for new entry
     this.isEditing = false;
     this.entryType = 'expense'; // Reset to expense for new entry
+    this.showCategoryDropdown = false; // Reset dropdown state for new entries
+  }
+
+  // Also check when frequent categories change
+  if (changes['frequentCategories'] || changes['frequentSavingsCategories']) {
+    if (this.isEditing && this.model.category_id) {
+      this.checkAndShowCategoryDropdown();
+    }
   }
 }
    closePopup(refresh: boolean = true) {
@@ -97,6 +109,29 @@ ngOnChanges(changes:SimpleChanges) {
   selectCategory(cat: any) {
     console.log('Category selected:', cat);
     this.model.category_id = cat.category_id;
+  }
+
+  checkAndShowCategoryDropdown() {
+    if (!this.model.category_id) {
+      return; // No category selected, don't show dropdown
+    }
+
+    let isCategoryInFrequent = false;
+
+    if (this.entryType === 'expense' && this.frequentCategories) {
+      // Check if current category exists in frequent expense categories
+      isCategoryInFrequent = this.frequentCategories.some(cat => cat.category_id === this.model.category_id);
+    } else if (this.entryType === 'saving' && this.frequentSavingsCategories) {
+      // Check if current category exists in frequent savings categories
+      isCategoryInFrequent = this.frequentSavingsCategories.some(cat => cat.category_id === this.model.category_id);
+    }
+
+    // If category is not in frequent categories, show the dropdown
+    if (!isCategoryInFrequent) {
+      this.showCategoryDropdown = true;
+    } else {
+      this.showCategoryDropdown = false;
+    }
   }
   showCategoryDropdownMethod() {
     this.showCategoryDropdown = !this.showCategoryDropdown;
