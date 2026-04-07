@@ -6,6 +6,7 @@ import { Expense } from '../models/expense.model';
 import { environment } from '../../environments/environments';
 import { AuthService } from './auth.service';
 import { CategoryService } from './category.service';
+import { NotificationService } from './notification.service';
 import { ToastService } from './toast.service';
 
 
@@ -22,7 +23,12 @@ export interface ExpenseGroup {
 export class ExpenseService {
 
  public supabase: SupabaseClient;
-   constructor(private authService: AuthService,private categoryService:CategoryService, private toastService: ToastService) {
+   constructor(
+    private authService: AuthService,
+    private categoryService: CategoryService,
+    private notificationService: NotificationService,
+    private toastService: ToastService
+  ) {
      this.supabase = createClient(
       environment.supabaseUrl, environment.supabaseKey
      );
@@ -186,6 +192,7 @@ private subscription: any;
       }
 
       this.toastService.expenseAdded();
+      void this.notificationService.handleNewExpense(expense);
       return data?.[0] as Expense;
     } catch (error: any) {
       console.error('Error in addExpense:', error);

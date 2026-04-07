@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule, JsonPipe } from '@angular/common';
 import { SupabaseService } from './services/supabase.service';
 import { Router, RouterOutlet } from '@angular/router';
@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { BottomNavComponent } from "./components/bottom-nav/bottom-nav.component";
 import { AuthService } from './services/auth.service';
+import { NotificationService } from './services/notification.service';
 import { UpdateService } from './services/update.service';
 import { UpdatePromptComponent } from './components/update-prompt/update-prompt.component';
 
@@ -26,6 +27,7 @@ export class AppComponent implements OnInit {
     private supabase: SupabaseService,
     private router: Router,
     private auth: AuthService,
+    private notificationService: NotificationService,
     private updateService: UpdateService
   ) {
     console.log('AppComponent constructor called.');
@@ -37,9 +39,13 @@ export class AppComponent implements OnInit {
       this.updateAvailable = available;
     });
   }
-showNav = true;
-lightTheme = false;
-  toggleTheme(){ this.lightTheme = !this.lightTheme; }
+
+  showNav = true;
+  lightTheme = false;
+
+  toggleTheme() {
+    this.lightTheme = !this.lightTheme;
+  }
 
   async logout() {
     try {
@@ -72,11 +78,14 @@ lightTheme = false;
     //   if (session) {
     //     if (!cur || cur === '/' || cur === '/login') this.router.navigate(['/home']);
     //   } else {
-    //     if (cur !== '/login') this.router.navigate(['/login']);
+    //     if (cur !== '/login') {
+    //       this.router.navigate(['/login']);
+    //     }
     //   }
     // });
 
-    // Check for updates every 30 minutes
+    this.notificationService.initNotifications();
+
     setInterval(() => {
       this.updateService.checkForUpdate();
     }, 30 * 60 * 1000); // 30 minutes
