@@ -13,6 +13,7 @@ import { ToastService } from './toast.service';
 
 export interface ExpenseGroup {
   date: string;
+  actualDate: Date;
   isCurrentMonth?: boolean;
   items: Expense[];
 }
@@ -104,6 +105,7 @@ private subscription: any;
 
   return {
     date: label,
+    actualDate: expenseDate,
     isCurrentMonth: expenseDate.getMonth() === today.getMonth() && expenseDate.getFullYear() === today.getFullYear(),
     items: grouped[date]
   };

@@ -63,7 +63,9 @@ export class NotificationService {
   }
 
   showNotification(title: string, body: string, tag?: string): void {
+    console.log('Attempting to show notification:', { title, body, tag, permission: Notification.permission });
     if (!this.isPermissionGranted()) {
+      console.warn('Notification permission not granted');
       return;
     }
 
@@ -73,22 +75,28 @@ export class NotificationService {
         icon: '/assets/icons/category/default_category_Icon.png',
         tag: tag ?? 'family-expense-tracker'
       };
-      new Notification(title, options);
+      const notification = new Notification(title, options);
+      console.log('Notification created:', notification);
     } catch (err) {
       console.error('Unable to display notification:', err);
     }
   }
 
   async handleNewExpense(expense: Expense): Promise<void> {
+    console.log('Handling new expense for notifications:', expense);
     const userName = this.authService.getUserName();
     const categoryName = await this.resolveCategoryName(expense);
     const amount = expense.amount ?? 0;
 
+    console.log('Resolved category:', categoryName, 'amount:', amount);
+
     if (categoryName.toLowerCase() === 'dining' || categoryName.toLowerCase() === 'grocery') {
+      console.log('Sending budget threshold alert for', categoryName);
       await this.sendBudgetThresholdAlert(categoryName, amount, userName);
     }
 
     if (expense.payment_method?.toLowerCase() === 'cc' || expense.payment_method?.toLowerCase() === 'credit') {
+      console.log('Sending credit card notification');
       this.showNotification(
         'Credit Card Transaction',
         `${userName} added a Credit Card transaction of ₹${amount}.`,
@@ -243,6 +251,12 @@ export class NotificationService {
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
       const allotments = await this.allotmentService.getAllotments(month, year);
+
+      if (!allotments || allotments.length === 0) {
+        console.log('No allotments found, skipping daily summary');
+        return;
+      }
+
       const grocery = allotments.find(a => a.category?.toLowerCase() === 'grocery');
       const dining = allotments.find(a => a.category?.toLowerCase() === 'dining');
       const creditCardAmount = await this.fetchCreditCardAmount(month, year);
@@ -265,6 +279,12 @@ export class NotificationService {
       const month = now.getMonth() + 1;
       const year = now.getFullYear();
       const allotments = await this.allotmentService.getAllotments(month, year);
+
+      if (!allotments || allotments.length === 0) {
+        console.log('No allotments found, skipping weekly summary');
+        return;
+      }
+
       const grocery = allotments.find(a => a.category?.toLowerCase() === 'grocery');
       const dining = allotments.find(a => a.category?.toLowerCase() === 'dining');
 

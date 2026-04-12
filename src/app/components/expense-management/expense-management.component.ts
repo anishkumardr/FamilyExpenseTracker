@@ -195,6 +195,7 @@ export class ExpenseManagementComponent {
             ...expense,
             type: 'expense',
             date: group.date,
+            actualDate: group.actualDate,
             isCurrentMonth: group.isCurrentMonth
           });
         });
@@ -209,6 +210,7 @@ export class ExpenseManagementComponent {
             ...saving,
             type: 'saving',
             date: group.date,
+            actualDate: group.actualDate,
             amount: saving.amount, // Already in correct format
             category: saving.category_name,
             description: saving.comments,
@@ -221,20 +223,27 @@ export class ExpenseManagementComponent {
     // Group by date
     const groupedByDate: { [key: string]: any[] } = {};
     allTransactions.forEach(transaction => {
-      if (!groupedByDate[transaction.date]) {
-        groupedByDate[transaction.date] = [];
+      const dateKey = transaction.actualDate.toDateString();
+      if (!groupedByDate[dateKey]) {
+        groupedByDate[dateKey] = [];
       }
-      groupedByDate[transaction.date].push(transaction);
+      groupedByDate[dateKey].push(transaction);
     });
 
     // Convert to array and sort by date (latest first)
     this.transactionsGrouped = Object.keys(groupedByDate)
       .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-      .map(date => ({
-        date: date,
-        items: groupedByDate[date],
-        isCurrentMonth: groupedByDate[date][0]?.isCurrentMonth || false
-      }));
+      .map(dateKey => {
+        const transactions = groupedByDate[dateKey];
+        const actualDate = transactions[0].actualDate;
+        const displayDate = transactions[0].date; // Use the display date from the first transaction
+        return {
+          date: displayDate,
+          actualDate: actualDate,
+          items: transactions,
+          isCurrentMonth: transactions[0]?.isCurrentMonth || false
+        };
+      });
 
     // Extract all unique category names for filter dropdown
     const categorySet = new Set<string>();
@@ -256,8 +265,7 @@ export class ExpenseManagementComponent {
     const filter = this.advancedFilter;
 
     // Helper function to check if transaction passes date filter
-    const passesDateFilter = (groupDate: string): boolean => {
-      const dateObj = new Date(groupDate);
+    const passesDateFilter = (dateObj: Date): boolean => {
       const dateMonth = dateObj.getMonth();
       const dateYear = dateObj.getFullYear();
       const todayMonth = today.getMonth();
@@ -282,10 +290,11 @@ export class ExpenseManagementComponent {
           endDate.setHours(23, 59, 59, 999);
         }
 
-        dateObj.setHours(0, 0, 0, 0);
+        const compareDate = new Date(dateObj);
+        compareDate.setHours(0, 0, 0, 0);
 
-        if (startDate && dateObj < startDate) return false;
-        if (endDate && dateObj > endDate) return false;
+        if (startDate && compareDate < startDate) return false;
+        if (endDate && compareDate > endDate) return false;
         return true;
       }
 
@@ -338,7 +347,7 @@ export class ExpenseManagementComponent {
     this.filteredTransactionsGrouped = this.transactionsGrouped
       .map(group => ({
         ...group,
-        items: group.items.filter((transaction: any) => passesDateFilter(group.date) && passesTypeFilter(transaction))
+        items: group.items.filter((transaction: any) => passesDateFilter(group.actualDate) && passesTypeFilter(transaction))
       }))
       .filter(group => group.items.length > 0); // Remove empty groups
 

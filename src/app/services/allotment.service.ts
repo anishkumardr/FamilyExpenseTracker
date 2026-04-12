@@ -72,13 +72,17 @@ console.log('Global categories map:', mergedCategoriesMap);
 (allotmentsData || []).forEach(allot => {
   if (allot && allot.category_id) {
     // Find matching global category to get its details
-    const matchingCategory = familyCats?.find(c => c.id === allot.category_id);
-    mergedCategoriesMap.set(allot.category_id,matchingCategory);
+    const matchingCategory = familyCats?.find(c => c.id === allot.category_id) ||
+                            globalCategories?.find(c => c.id === allot.category_id);
+    if (matchingCategory) {
+      mergedCategoriesMap.set(allot.category_id, matchingCategory);
+    }
   }
 });
 
 const categories = Array.from(mergedCategoriesMap.values());
 console.log('Merged categories:', categories);
+console.log('Categories with issues:', categories.filter(cat => !cat || !cat.id));
 const lastDay = new Date(year, month, 0).getDate();
 const { data: expenseSpent, error: expenseError } = await this.supabase
     .from('expense_management')
@@ -110,7 +114,9 @@ console.log('Fetched expense spent data:', expenseSpent);
   });
 
   // 3️⃣ Map categories to allotments
-  const allotments: Allotment[] = categories!.map(cat => {
+  const allotments: Allotment[] = categories!
+    .filter(cat => cat && cat.id) // Filter out invalid categories
+    .map(cat => {
     const existing = allotmentsData?.find(a => a.category_id === cat.id);
     const totalSpent = spentMap[cat.id] || 0;
     return {

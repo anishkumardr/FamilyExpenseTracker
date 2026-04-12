@@ -85,6 +85,7 @@ console.log('Grouped savings:', grouped);
         const savingDate = new Date(dateKey);
         return {
           date: label,
+          actualDate: savingDate,
           isCurrentMonth: savingDate.getMonth() === today.getMonth() && savingDate.getFullYear() === today.getFullYear(),
           items: grouped[dateKey]
         };
